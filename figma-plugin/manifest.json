@@ -1,0 +1,17 @@
+{
+  "name": "DDA.az Design Exporter",
+  "id": "dda-design-exporter",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "editorType": [
+    "figma"
+  ],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://whimsical-scone-b4d210.netlify.app"
+    ]
+  }
+}

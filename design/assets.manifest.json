@@ -1,0 +1,212 @@
+{
+  "$schema": "https://example.com/dda-assets.schema.json",
+  "icons": [
+    {
+      "name": "home",
+      "title": "Home Tab Icon",
+      "emoji": "🏠",
+      "category": "icon",
+      "group": "navigation",
+      "format": "svg",
+      "usage": "Main bottom navigation home tab",
+      "sizes": [
+        { "width": 16, "height": 16, "scale": "@1x", "path": "assets/icons/navigation/home-16.svg" },
+        { "width": 24, "height": 24, "scale": "@2x", "path": "assets/icons/navigation/home-24.svg" },
+        { "width": 32, "height": 32, "scale": "@3x", "path": "assets/icons/navigation/home-32.svg" }
+      ],
+      "variants": null,
+      "pagesUsed": ["Home"],
+      "tokenRef": null,
+      "export": { "background": "transparent", "padding": 0, "optimize": true }
+    },
+    {
+      "name": "topics",
+      "title": "Topics Tab Icon",
+      "emoji": "📚",
+      "category": "icon",
+      "group": "navigation",
+      "format": "svg",
+      "usage": "Topics tab icon",
+      "sizes": [
+        { "width": 16, "height": 16, "scale": "@1x", "path": "assets/icons/navigation/topics-16.svg" },
+        { "width": 24, "height": 24, "scale": "@2x", "path": "assets/icons/navigation/topics-24.svg" },
+        { "width": 32, "height": 32, "scale": "@3x", "path": "assets/icons/navigation/topics-32.svg" }
+      ],
+      "variants": null,
+      "pagesUsed": ["Topics"],
+      "tokenRef": null,
+      "export": { "background": "transparent", "padding": 0, "optimize": true }
+    },
+    {
+      "name": "exam",
+      "title": "Exam Tab Icon",
+      "emoji": "🧪",
+      "category": "icon",
+      "group": "navigation",
+      "format": "svg",
+      "usage": "Exam tab icon",
+      "sizes": [
+        { "width": 16, "height": 16, "scale": "@1x", "path": "assets/icons/navigation/exam-16.svg" },
+        { "width": 24, "height": 24, "scale": "@2x", "path": "assets/icons/navigation/exam-24.svg" },
+        { "width": 32, "height": 32, "scale": "@3x", "path": "assets/icons/navigation/exam-32.svg" }
+      ],
+      "variants": null,
+      "pagesUsed": ["ExamConfig", "ExamRun"],
+      "tokenRef": null,
+      "export": { "background": "transparent", "padding": 0, "optimize": true }
+    },
+    {
+      "name": "mistakes",
+      "title": "Mistakes Tab Icon",
+      "emoji": "⚠️",
+      "category": "icon",
+      "group": "navigation",
+      "format": "svg",
+      "usage": "Mistakes tab icon",
+      "sizes": [
+        { "width": 16, "height": 16, "scale": "@1x", "path": "assets/icons/navigation/mistakes-16.svg" },
+        { "width": 24, "height": 24, "scale": "@2x", "path": "assets/icons/navigation/mistakes-24.svg" },
+        { "width": 32, "height": 32, "scale": "@3x", "path": "assets/icons/navigation/mistakes-32.svg" }
+      ],
+      "variants": null,
+      "pagesUsed": ["Mistakes"],
+      "tokenRef": null,
+      "export": { "background": "transparent", "padding": 0, "optimize": true }
+    },
+    {
+      "name": "store",
+      "title": "Store Tab Icon",
+      "emoji": "🛍️",
+      "category": "icon",
+      "group": "navigation",
+      "format": "svg",
+      "usage": "Store tab icon",
+      "sizes": [
+        { "width": 16, "height": 16, "scale": "@1x", "path": "assets/icons/navigation/store-16.svg" },
+        { "width": 24, "height": 24, "scale": "@2x", "path": "assets/icons/navigation/store-24.svg" },
+        { "width": 32, "height": 32, "scale": "@3x", "path": "assets/icons/navigation/store-32.svg" }
+      ],
+      "variants": null,
+      "pagesUsed": ["Store"],
+      "tokenRef": null,
+      "export": { "background": "transparent", "padding": 0, "optimize": true }
+    },
+    {
+      "name": "more",
+      "title": "More Menu Icon",
+      "emoji": "➕",
+      "category": "icon",
+      "group": "navigation",
+      "format": "svg",
+      "usage": "More menu icon",
+      "sizes": [
+        { "width": 16, "height": 16, "scale": "@1x", "path": "assets/icons/navigation/more-16.svg" },
+        { "width": 24, "height": 24, "scale": "@2x", "path": "assets/icons/navigation/more-24.svg" },
+        { "width": 32, "height": 32, "scale": "@3x", "path": "assets/icons/navigation/more-32.svg" }
+      ],
+      "variants": null,
+      "pagesUsed": ["Home", "Topics", "ExamConfig", "ExamRun", "Results", "Mistakes", "Store"],
+      "tokenRef": null,
+      "export": { "background": "transparent", "padding": 0, "optimize": true }
+    },
+    {
+      "name": "video",
+      "title": "Video Lessons Icon",
+      "emoji": "🎬",
+      "category": "icon",
+      "group": "actions",
+      "format": "svg",
+      "usage": "Video lessons icon",
+      "monochrome": true,
+      "tokenRef": "colors.primary.500",
+      "sizes": [
+        { "width": 16, "height": 16, "scale": "@1x", "path": "assets/icons/actions/video-16.svg" },
+        { "width": 24, "height": 24, "scale": "@2x", "path": "assets/icons/actions/video-24.svg" },
+        { "width": 32, "height": 32, "scale": "@3x", "path": "assets/icons/actions/video-32.svg" }
+      ],
+      "variants": null,
+      "pagesUsed": ["Home", "Lesson"],
+      "tokenRef": "colors.primary.500",
+      "export": { "background": "transparent", "padding": 0, "optimize": true }
+    },
+    {
+      "name": "notifications",
+      "title": "Notifications Icon",
+      "emoji": "🔔",
+      "category": "icon",
+      "group": "system",
+      "format": "svg",
+      "usage": "Notifications icon",
+      "monochrome": true,
+      "tokenRef": "colors.semantic.text.secondary",
+      "sizes": [
+        { "width": 16, "height": 16, "scale": "@1x", "path": "assets/icons/system/notifications-16.svg" },
+        { "width": 24, "height": 24, "scale": "@2x", "path": "assets/icons/system/notifications-24.svg" },
+        { "width": 32, "height": 32, "scale": "@3x", "path": "assets/icons/system/notifications-32.svg" }
+      ],
+      "variants": null,
+      "pagesUsed": ["Home", "Topics", "Lesson", "ExamConfig", "ExamRun", "Results", "Mistakes", "Store"],
+      "tokenRef": "colors.semantic.text.secondary",
+      "export": { "background": "transparent", "padding": 0, "optimize": true }
+    },
+    {
+      "name": "assistant",
+      "title": "AI Assistant Icon",
+      "emoji": "🤖",
+      "category": "icon",
+      "group": "system",
+      "format": "svg",
+      "usage": "AI assistant icon",
+      "monochrome": true,
+      "tokenRef": "colors.semantic.text.secondary",
+      "sizes": [
+        { "width": 16, "height": 16, "scale": "@1x", "path": "assets/icons/system/assistant-16.svg" },
+        { "width": 24, "height": 24, "scale": "@2x", "path": "assets/icons/system/assistant-24.svg" },
+        { "width": 32, "height": 32, "scale": "@3x", "path": "assets/icons/system/assistant-32.svg" }
+      ],
+      "variants": null,
+      "pagesUsed": ["Home", "Topics", "Lesson", "ExamConfig", "ExamRun", "Results", "Mistakes", "Store"],
+      "tokenRef": "colors.semantic.text.secondary",
+      "export": { "background": "transparent", "padding": 0, "optimize": true }
+    },
+    {
+      "name": "language",
+      "title": "Language Switcher Icon",
+      "emoji": "🌐",
+      "category": "icon",
+      "group": "system",
+      "format": "svg",
+      "usage": "Language switcher icon",
+      "monochrome": true,
+      "tokenRef": "colors.semantic.text.secondary",
+      "sizes": [
+        { "width": 16, "height": 16, "scale": "@1x", "path": "assets/icons/system/language-16.svg" },
+        { "width": 24, "height": 24, "scale": "@2x", "path": "assets/icons/system/language-24.svg" },
+        { "width": 32, "height": 32, "scale": "@3x", "path": "assets/icons/system/language-32.svg" }
+      ],
+      "variants": null,
+      "pagesUsed": ["Home", "Topics", "Lesson", "ExamConfig", "ExamRun", "Results", "Mistakes", "Store"],
+      "tokenRef": "colors.semantic.text.secondary",
+      "export": { "background": "transparent", "padding": 0, "optimize": true }
+    }
+  ],
+  "images": [
+    {
+      "name": "question-placeholder",
+      "title": "Question Placeholder",
+      "category": "image",
+      "group": "placeholders",
+      "format": "jpg",
+      "usage": "Question image placeholder",
+      "sizes": [
+        { "width": 400, "height": 300, "scale": "@1x", "path": "assets/images/placeholders/question-placeholder-400x300.jpg" },
+        { "width": 800, "height": 600, "scale": "@2x", "path": "assets/images/placeholders/question-placeholder-800x600.jpg" }
+      ],
+      "pagesUsed": ["Practice", "ExamRun"],
+      "tokenRef": null,
+      "export": { "background": "transparent", "padding": 0, "optimize": true }
+    }
+  ],
+  "fonts": [],
+  "lottie": []
+}

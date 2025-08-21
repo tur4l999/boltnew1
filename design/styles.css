@@ -1,0 +1,107 @@
+/* Auto-generated from design/tokens.json */
+/* Do not edit directly - run npm run tokens to regenerate */
+:root {
+  --color-primary-50: #f0fdf4;
+  --color-primary-100: #dcfce7;
+  --color-primary-200: #bbf7d0;
+  --color-primary-300: #86efac;
+  --color-primary-400: #4ade80;
+  --color-primary-500: #22c55e;
+  --color-primary-600: #16a34a;
+  --color-primary-700: #15803d;
+  --color-primary-800: #166534;
+  --color-primary-900: #14532d;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+  --color-emerald-900: #064e3b;
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-red-800: #991b1b;
+  --color-red-900: #7f1d1d;
+  --color-semantic-background: #f9fafb;
+  --color-semantic-surface: #ffffff;
+  --color-semantic-text-primary: #111827;
+  --color-semantic-text-secondary: #6b7280;
+  --color-semantic-text-muted: #9ca3af;
+  --color-semantic-border: #e5e7eb;
+  --color-semantic-success: #10b981;
+  --color-semantic-warning: #f59e0b;
+  --color-semantic-error: #ef4444;
+  --spacing-xs: 4;
+  --spacing-sm: 8;
+  --spacing-md: 12;
+  --spacing-lg: 16;
+  --spacing-xl: 20;
+  --spacing-2xl: 24;
+  --spacing-3xl: 32;
+  --spacing-4xl: 40;
+  --spacing-5xl: 48;
+  --typography-fontFamily-primary: system-ui, -apple-system, sans-serif;
+  --typography-fontSize-xs: 12;
+  --typography-fontSize-sm: 14;
+  --typography-fontSize-base: 16;
+  --typography-fontSize-lg: 18;
+  --typography-fontSize-xl: 20;
+  --typography-fontSize-2xl: 24;
+  --typography-fontSize-3xl: 30;
+  --typography-fontSize-4xl: 36;
+  --typography-fontWeight-normal: 400;
+  --typography-fontWeight-medium: 500;
+  --typography-fontWeight-semibold: 600;
+  --typography-fontWeight-bold: 700;
+  --typography-fontWeight-black: 900;
+  --typography-lineHeight-tight: 1.2;
+  --typography-lineHeight-normal: 1.5;
+  --typography-lineHeight-relaxed: 1.75;
+  --radius-none: 0;
+  --radius-sm: 4;
+  --radius-md: 8;
+  --radius-lg: 12;
+  --radius-xl: 16;
+  --radius-2xl: 20;
+  --radius-full: 9999;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --breakpoint-mobile: 320;
+  --breakpoint-tablet: 768;
+  --breakpoint-desktop: 1024;
+}
+
+/* Utility Classes */
+.text-primary { color: var(--color-semantic-text-primary); }
+.text-secondary { color: var(--color-semantic-text-secondary); }
+.text-muted { color: var(--color-semantic-text-muted); }
+.bg-surface { background-color: var(--color-semantic-surface); }
+.bg-background { background-color: var(--color-semantic-background); }
+.border-default { border-color: var(--color-semantic-border); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }

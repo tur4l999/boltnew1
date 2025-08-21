@@ -1,0 +1,13 @@
+name,type,props,states,events,accessibility,usage,status
+Header,Layout,"title:string; showBack?:boolean; actions?:Action[]",default,onActionClick,"role=header; h1; min 44x44 touch targets","All screens",Active
+TabBar,Navigation,"tabs:Tab[]; active:string","home|topics|exam|mistakes|store|more",onChange(key),"min 44x44; labels visible; role=tablist","Main navigation",Active
+Card,Container,"children:ReactNode; className?:string",default,,"role=region when needed","Content grouping",Active
+Button,Interactive,"variant:'primary'|'secondary'|'ghost'; size:'sm'|'md'|'lg'; disabled?:boolean","default|loading|disabled",onClick(),"min 44x44; aria-pressed when toggle; contrast ≥4.5:1","Actions, forms",Active
+IconButton,Interactive,"icon:ReactNode; onClick?:()=>void; label:string; className?:string","default|hover|pressed",onClick(),"min 44x44; aria-label required; contrast ≥4.5:1","Header actions",Active
+Progress,Display,"value:number; max?:number; className?:string",default,,"aria-valuenow; aria-valuemax; role=progressbar","Learning progress",Active
+VideoPlayer,Media,"src:string; watermark?:boolean","loading|playing|paused|ended","onPlay,onPause,onEnd","captions optional; keyboard controls","Lesson content",Active
+Sheet,Overlay,"visible:boolean; onClose:()=>void; children:ReactNode","hidden|visible",onClose(),"focus trap; ESC to close; aria-modal=true","More menu",Active
+Timer,Display,"timeLeft:number","ticking|elapsed",onTimeUp(),"aria-live=polite; announce time warnings","Exam screen",Active
+PracticeInline,Interactive,"questions:Question[]","answering|locked|explained","onAnswer,onNext,onPrev","keyboard navigation; clear feedback","Practice questions",Active
+MoreSheet,Overlay,"visible:boolean; onClose:()=>void","hidden|visible",onClose(),"focus trap; backdrop dismiss","Additional options",Active
+ScreenRenderer,Navigation,"currentScreen:NavigationScreen","loading|ready",,"route announcements for screen readers","Screen routing",Active

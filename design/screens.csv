@@ -1,0 +1,10 @@
+name,route,params,description,components,states,status
+Home,/,,"Ana səhifə - tələbə proqresi və əsas funksiyalar","Header|Card|Progress|Button","loading|ready|empty",Active
+Topics,/topics,,"Təlim mövzuları siyahısı","Header|Card|Button|Progress","loading|ready|empty",Active
+Lesson,/lesson/:id,"id:string","Video və materiallar","Header|VideoPlayer|TabBar|Card|Button","loading|playing|paused",Active
+Practice,/practice,,"Sürətli test və məşq","Card|Button|PracticeInline","answering|locked|explained",Active
+ExamConfig,/exam/config,,"İmtahan tənzimləmələri","Card|Button","configuring|ready",Active
+ExamRun,/exam/run,"config:ExamConfig","İmtahan icra ekranı","Card|Button|Timer","countdown|running|finished",Active
+Results,/results,"result:ExamResult","İmtahan nəticələri","Card|Button","loading|ready|empty",Active
+Mistakes,/mistakes,,"Səhv edilmiş suallar","Card","loading|ready|empty",Active
+Store,/store,,"Mağaza və məhsullar","Card|Button","loading|ready|empty",Active
