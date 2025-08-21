@@ -150,6 +150,83 @@ const styles = StyleSheet.create({
 **AZ/EN**: Bu sistem həm Azərbaycan, həm də İngilis dilində şərhlər dəstəkləyir.
 **Stability**: Bütün asset adları və token strukturu sabit saxlanılır.
 **Accessibility**: WCAG 2.1 AA standartlarına uyğundur.
+
+## 🎨 Figma Export
+
+Bu layihə html.to.design plugin ilə Figma-ya asanlıqla import edilə bilər.
+
+### 🚀 Quick Start
+
+```bash
+npm run export:figma    # Build static HTML exports
+npm run preview:figma   # Start preview server
+npm run verify:figma    # Verify export quality
+```
+
+### 📱 Export Features
+
+- **20+ Screens**: Login, Home, Topics, Lessons, Exam, Store, Settings
+- **Device Sizes**: iPhone 13 (390×844), iPhone 12 Mini (375×812)
+- **Themes**: Light & Dark mode variants
+- **Languages**: Azərbaycan, Русский, English
+- **Static HTML**: No JavaScript required for import
+- **Design Tokens**: CSS variables for clean layer import
+
+### 🔗 Import Methods
+
+#### Option A: Web Method
+1. Deploy `dist/figma-export/` to any web server
+2. Copy the public URL
+3. Open html.to.design plugin in Figma
+4. Paste URL in Web tab → Import
+
+#### Option B: File Method
+1. Run `npm run export:figma`
+2. Open html.to.design plugin in Figma
+3. Drag `dist/figma-export/index.html` into File tab
+4. Select screens to import
+
+#### Option C: Extension Method
+1. Run `npm run preview:figma`
+2. Open http://localhost:5173/figma-export/
+3. Install html.to.design Chrome extension
+4. Click extension → Capture → Send to Figma
+
+### 📋 Export Structure
+
+```
+dist/figma-export/
+├── index.html              # Gallery with all screens
+├── login.html              # Individual screen exports
+├── home.html
+├── topics.html
+├── packages.html
+├── ai-chat.html
+├── settings.html
+├── figma-manifest.json     # Export metadata
+├── assets/                 # CSS and images
+└── thumbs/                 # Preview thumbnails
+```
+
+### 🎯 Quality Features
+
+- **No Animations**: Disabled for clean import (`animation: none`)
+- **Embedded Fonts**: No FOUT issues during import
+- **Device Frames**: Mobile viewport with status bar
+- **Design Tokens**: CSS variables map to Figma styles
+- **Static Assets**: All images embedded or absolute paths
+- **Responsive**: Multiple device sizes supported
+
+### 🔍 Verification
+
+The export includes automatic verification:
+- ✅ All screen files generated
+- ✅ Valid HTML structure
+- ✅ Design tokens present
+- ✅ Assets accessible
+- ✅ Mobile viewport configured
+
+Run `npm run verify:figma` after export to ensure quality.
 ## 🔍 Design Inspector
 
 Figma-style inspector səhifəsinə daxil olmaq üçün:
