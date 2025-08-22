@@ -1,17 +1,8 @@
 {
-  "name": "DDA.az Design Exporter",
+  "name": "DDA.az Design Exporter (Widget)",
   "api": "1.0.0",
-  "main": "code.js",
-  "ui": "ui.html",
+  "widgetApi": "1.0.0",
+  "containsWidget": true,
   "editorType": ["figma"],
-  "networkAccess": { "allowedDomains": ["*"] },
-  "menu": [
-    { "name": "Export selected", "command": "export-selected" },
-    { "name": "Export all screens", "command": "export-all" },
-    "-",
-    { "name": "Settings", "command": "settings" }
-  ],
-  "relaunchButtons": [
-    { "command": "export-selected", "name": "Export with DDA.az", "multipleSelection": true }
-  ]
+  "main": "widget.js"
 }
