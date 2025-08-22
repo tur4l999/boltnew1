@@ -1,12 +1,16 @@
 {
-"name": "DDA.az Design Exporter",
-"id": "dda-design-exporter",
-"api": "1.0.0",
-"editorType": ["figma"],
-"main": "code.js",
-"ui": "ui.html",
-"relaunchButtons": [
-{ "command": "create-all", "name": "Create All Screens" },
-{ "command": "create-styles", "name": "Create Styles" }
-]
+  "name": "DDA.az Design Exporter",
+  "id": "dda-design-exporter",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "containsWidget": false,
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  },
+  "relaunchButtons": [
+    { "command": "create-all", "name": "Create All Screens" },
+    { "command": "create-styles", "name": "Create Styles" }
+  ]
 }
