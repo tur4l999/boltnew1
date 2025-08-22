@@ -381,11 +381,32 @@ async function createScreenDesign(frame, screen) {
       case 'store':
         await createStoreDesign(frame, screen.isDark);
         break;
+      case 'more':
+        await createMoreDesign(frame, screen.isDark);
+        break;
       case 'packages':
         await createPackagesDesign(frame, screen.isDark);
         break;
+      case 'package-details':
+        await createPackageDetailsDesign(frame, screen.isDark);
+        break;
+      case 'payment':
+        await createPaymentDesign(frame, screen.isDark);
+        break;
+      case 'success':
+        await createSuccessDesign(frame, screen.isDark);
+        break;
       case 'lesson':
         await createLessonDesign(frame, screen.isDark);
+        break;
+      case 'video':
+        await createVideoDesign(frame, screen.isDark);
+        break;
+      case 'practice':
+        await createPracticeDesign(frame, screen.isDark);
+        break;
+      case 'teacher':
+        await createTeacherDesign(frame, screen.isDark);
         break;
       case 'exam-config':
         await createExamConfigDesign(frame, screen.isDark);
@@ -393,11 +414,35 @@ async function createScreenDesign(frame, screen) {
       case 'exam-running':
         await createExamRunningDesign(frame, screen.isDark);
         break;
+      case 'results-pass':
+        await createResultsDesign(frame, true, screen.isDark);
+        break;
+      case 'results-fail':
+        await createResultsDesign(frame, false, screen.isDark);
+        break;
+      case 'mistakes':
+        await createMistakesDesign(frame, screen.isDark);
+        break;
       case 'ai-chat':
         await createAIChatDesign(frame, screen.isDark);
         break;
+      case 'chat-history':
+        await createChatHistoryDesign(frame, screen.isDark);
+        break;
+      case 'notifications':
+        await createNotificationsDesign(frame, screen.isDark);
+        break;
       case 'settings':
         await createSettingsDesign(frame, screen.isDark);
+        break;
+      case 'profile-edit':
+        await createProfileEditDesign(frame, screen.isDark);
+        break;
+      case 'transactions':
+        await createTransactionsDesign(frame, screen.isDark);
+        break;
+      case 'balance':
+        await createBalanceDesign(frame, screen.isDark);
         break;
       default:
         await createDefaultDesign(frame, screen);
@@ -500,6 +545,83 @@ async function createLoginDesign(frame, isDark = false) {
   formContainer.appendChild(socialButton);
 }
 
+// Onboarding ekranları
+async function createOnboardingDesign(frame, step, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f0fdf4';
+  const textColor = isDark ? '#f9fafb' : '#111827';
+  const mutedColor = isDark ? '#9ca3af' : '#6b7280';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  const content = {
+    1: { emoji: '🎓', title: 'DDA.az-a Xoş Gəldiniz', text: 'Sürücülük vəsiqəsi almaq üçün ən yaxşı hazırlıq platforması' },
+    2: { emoji: '📱', title: 'Müasir Təlim Sistemi', text: '3D video dərslər, AI köməkçi və real imtahan simulyatoru' },
+    3: { emoji: '🚀', title: 'Hazırsınız!', text: 'İndi təlimə başlayaq və sürücülük vəsiqənizi alaq' }
+  };
+
+  const stepContent = content[step];
+
+  // Content container
+  const container = figma.createFrame();
+  container.resize(335, 400);
+  container.x = 20;
+  container.y = 200;
+  container.fills = [];
+  container.layoutMode = 'VERTICAL';
+  container.primaryAxisAlignItems = 'CENTER';
+  container.counterAxisAlignItems = 'CENTER';
+  container.itemSpacing = 24;
+  frame.appendChild(container);
+
+  // Emoji
+  const emoji = figma.createText();
+  emoji.characters = stepContent.emoji;
+  emoji.fontSize = 80;
+  emoji.fontName = currentFont;
+  container.appendChild(emoji);
+
+  // Title
+  const title = figma.createText();
+  title.characters = stepContent.title;
+  title.fontSize = 24;
+  title.fontName = boldFont;
+  title.fills = [{ type: 'SOLID', color: hexToRgb(textColor) }];
+  title.textAlignHorizontal = 'CENTER';
+  container.appendChild(title);
+
+  // Description
+  const description = figma.createText();
+  description.characters = stepContent.text;
+  description.fontSize = 16;
+  description.fontName = currentFont;
+  description.fills = [{ type: 'SOLID', color: hexToRgb(mutedColor) }];
+  description.textAlignHorizontal = 'CENTER';
+  description.resize(295, 48);
+  container.appendChild(description);
+
+  // Progress dots
+  const dotsContainer = figma.createFrame();
+  dotsContainer.resize(60, 8);
+  dotsContainer.fills = [];
+  dotsContainer.layoutMode = 'HORIZONTAL';
+  dotsContainer.itemSpacing = 8;
+  container.appendChild(dotsContainer);
+
+  for (let i = 1; i <= 3; i++) {
+    const dot = figma.createFrame();
+    dot.resize(8, 8);
+    dot.fills = [{ type: 'SOLID', color: hexToRgb(i === step ? '#22c55e' : '#e5e7eb') }];
+    dot.cornerRadius = 4;
+    dotsContainer.appendChild(dot);
+  }
+
+  // Next button
+  const nextButton = createButton(step === 3 ? 'Başlayaq' : 'Sonrakı', 'primary', isDark);
+  nextButton.y = 650;
+  nextButton.x = 40;
+  frame.appendChild(nextButton);
+}
+
 // Home (No Package) dizaynı
 async function createHomeNoPackageDesign(frame, isDark = false) {
   const bgColor = isDark ? '#111827' : '#f9fafb';
@@ -592,6 +714,509 @@ async function createHomeNoPackageDesign(frame, isDark = false) {
 
   // Tab bar
   const tabBar = createTabBar(0, isDark);
+  frame.appendChild(tabBar);
+}
+
+// Home Premium dizaynı
+async function createHomePremiumDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  // Header
+  const header = createHeader('Salam, Tural 👋', isDark);
+  frame.appendChild(header);
+
+  // Premium status card
+  const premiumCard = figma.createFrame();
+  premiumCard.resize(335, 60);
+  premiumCard.x = 20;
+  premiumCard.y = 80;
+  premiumCard.fills = [{ type: 'SOLID', color: hexToRgb('#f0fdf4') }];
+  premiumCard.cornerRadius = 12;
+  frame.appendChild(premiumCard);
+
+  const premiumText = figma.createText();
+  premiumText.characters = '👑 Premium üzv - Bütün funksiyalar aktiv';
+  premiumText.fontSize = 14;
+  premiumText.fontName = boldFont;
+  premiumText.fills = [{ type: 'SOLID', color: hexToRgb('#065f46') }];
+  premiumText.x = 16;
+  premiumText.y = 23;
+  premiumCard.appendChild(premiumText);
+
+  // Progress card (same as no-package but higher progress)
+  const progressCard = figma.createFrame();
+  progressCard.resize(335, 80);
+  progressCard.x = 20;
+  progressCard.y = 160;
+  progressCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+  progressCard.cornerRadius = 12;
+  progressCard.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.1 },
+    offset: { x: 0, y: 2 },
+    radius: 4,
+    visible: true
+  }];
+  frame.appendChild(progressCard);
+
+  const progressText = figma.createText();
+  progressText.characters = 'İrəliləyiş: 78%';
+  progressText.fontSize = 14;
+  progressText.fontName = currentFont;
+  progressText.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+  progressText.x = 16;
+  progressText.y = 16;
+  progressCard.appendChild(progressText);
+
+  // Progress bar (higher progress)
+  const progressBar = figma.createFrame();
+  progressBar.resize(303, 8);
+  progressBar.x = 16;
+  progressBar.y = 40;
+  progressBar.fills = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
+  progressBar.cornerRadius = 4;
+  progressCard.appendChild(progressBar);
+
+  const progressFill = figma.createFrame();
+  progressFill.resize(236, 8); // 78% of 303
+  progressFill.x = 0;
+  progressFill.y = 0;
+  progressFill.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+  progressFill.cornerRadius = 4;
+  progressBar.appendChild(progressFill);
+
+  // Action grid (all unlocked)
+  const actions = [
+    { title: '🎬 Video dərslər', locked: false },
+    { title: '📝 Sürətli test', locked: false },
+    { title: '📚 Təlim mövzuları', locked: false },
+    { title: '🧪 İmtahan', locked: false }
+  ];
+
+  let actionY = 260;
+  for (let i = 0; i < actions.length; i += 2) {
+    for (let j = 0; j < 2 && i + j < actions.length; j++) {
+      const action = actions[i + j];
+      const actionCard = createActionCard(action, 20 + j * 175, actionY, isDark);
+      frame.appendChild(actionCard);
+    }
+    actionY += 100;
+  }
+
+  // Tab bar
+  const tabBar = createTabBar(0, isDark);
+  frame.appendChild(tabBar);
+}
+
+// Topics Locked dizaynı
+async function createTopicsLockedDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  // Header with search
+  const header = createHeader('Təlim Mövzuları', isDark);
+  frame.appendChild(header);
+
+  // Search input
+  const searchInput = createInput('Mövzu axtarın...', isDark);
+  searchInput.x = 20;
+  searchInput.y = 80;
+  frame.appendChild(searchInput);
+
+  // Module list (mostly locked)
+  const modules = [
+    { title: 'M1: Yol hərəkəti qaydaları', progress: 100, locked: false },
+    { title: 'M2: Yol nişanları', progress: 45, locked: false },
+    { title: 'M3: Dairəvi hərəkət', progress: 0, locked: true },
+    { title: 'M4: Sürət məhdudiyyətləri', progress: 0, locked: true },
+    { title: 'M5: Piyada keçidləri', progress: 0, locked: true }
+  ];
+
+  let moduleY = 140;
+  for (const module of modules) {
+    const moduleCard = figma.createFrame();
+    moduleCard.resize(335, 80);
+    moduleCard.x = 20;
+    moduleCard.y = moduleY;
+    moduleCard.fills = [{ type: 'SOLID', color: hexToRgb(module.locked ? (isDark ? '#374151' : '#f9fafb') : surfaceColor) }];
+    moduleCard.cornerRadius = 12;
+    moduleCard.effects = [{
+      type: 'DROP_SHADOW',
+      color: { r: 0, g: 0, b: 0, a: 0.1 },
+      offset: { x: 0, y: 2 },
+      radius: 4,
+      visible: true
+    }];
+    frame.appendChild(moduleCard);
+
+    // Lock icon
+    if (module.locked) {
+      const lockIcon = figma.createText();
+      lockIcon.characters = '🔒';
+      lockIcon.fontSize = 16;
+      lockIcon.fontName = currentFont;
+      lockIcon.x = 16;
+      lockIcon.y = 16;
+      moduleCard.appendChild(lockIcon);
+    }
+
+    // Module title
+    const moduleTitle = figma.createText();
+    moduleTitle.characters = module.title;
+    moduleTitle.fontSize = 14;
+    moduleTitle.fontName = boldFont;
+    moduleTitle.fills = [{ type: 'SOLID', color: hexToRgb(module.locked ? (isDark ? '#9ca3af' : '#9ca3af') : (isDark ? '#f9fafb' : '#111827')) }];
+    moduleTitle.x = module.locked ? 45 : 16;
+    moduleTitle.y = 16;
+    moduleCard.appendChild(moduleTitle);
+
+    // Progress text
+    const progressText = figma.createText();
+    progressText.characters = `İrəliləyiş: ${module.progress}%`;
+    progressText.fontSize = 12;
+    progressText.fontName = currentFont;
+    progressText.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#9ca3af' : '#6b7280') }];
+    progressText.x = module.locked ? 45 : 16;
+    progressText.y = 35;
+    moduleCard.appendChild(progressText);
+
+    // Progress bar
+    const progressBar = figma.createFrame();
+    progressBar.resize(module.locked ? 254 : 283, 6);
+    progressBar.x = module.locked ? 45 : 16;
+    progressBar.y = 55;
+    progressBar.fills = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
+    progressBar.cornerRadius = 3;
+    moduleCard.appendChild(progressBar);
+
+    if (module.progress > 0) {
+      const progressFill = figma.createFrame();
+      progressFill.resize((module.locked ? 254 : 283) * module.progress / 100, 6);
+      progressFill.x = 0;
+      progressFill.y = 0;
+      progressFill.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+      progressFill.cornerRadius = 3;
+      progressBar.appendChild(progressFill);
+    }
+
+    // Start button
+    const startButton = createButton(module.locked ? 'Kilidli' : 'Başla', module.locked ? 'disabled' : 'primary', isDark);
+    startButton.resize(80, 32);
+    startButton.x = 271;
+    startButton.y = 24;
+    moduleCard.appendChild(startButton);
+
+    moduleY += 100;
+  }
+
+  // Tab bar
+  const tabBar = createTabBar(1, isDark);
+  frame.appendChild(tabBar);
+}
+
+// Topics Unlocked dizaynı
+async function createTopicsUnlockedDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  // Header
+  const header = createHeader('Təlim Mövzuları', isDark);
+  frame.appendChild(header);
+
+  // Premium status
+  const premiumCard = figma.createFrame();
+  premiumCard.resize(335, 50);
+  premiumCard.x = 20;
+  premiumCard.y = 80;
+  premiumCard.fills = [{ type: 'SOLID', color: hexToRgb('#f0fdf4') }];
+  premiumCard.cornerRadius = 12;
+  frame.appendChild(premiumCard);
+
+  const premiumText = figma.createText();
+  premiumText.characters = '🔓 Bütün təlimlər açıq - Premium üzv';
+  premiumText.fontSize = 14;
+  premiumText.fontName = boldFont;
+  premiumText.fills = [{ type: 'SOLID', color: hexToRgb('#065f46') }];
+  premiumText.x = 16;
+  premiumText.y = 18;
+  premiumCard.appendChild(premiumText);
+
+  // Search input
+  const searchInput = createInput('Mövzu axtarın...', isDark);
+  searchInput.x = 20;
+  searchInput.y = 150;
+  frame.appendChild(searchInput);
+
+  // Module list (all unlocked)
+  const modules = [
+    { title: 'M1: Yol hərəkəti qaydaları', progress: 100 },
+    { title: 'M2: Yol nişanları', progress: 85 },
+    { title: 'M3: Dairəvi hərəkət', progress: 60 },
+    { title: 'M4: Sürət məhdudiyyətləri', progress: 40 },
+    { title: 'M5: Piyada keçidləri', progress: 20 }
+  ];
+
+  let moduleY = 210;
+  for (const module of modules) {
+    const moduleCard = figma.createFrame();
+    moduleCard.resize(335, 80);
+    moduleCard.x = 20;
+    moduleCard.y = moduleY;
+    moduleCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+    moduleCard.cornerRadius = 12;
+    moduleCard.effects = [{
+      type: 'DROP_SHADOW',
+      color: { r: 0, g: 0, b: 0, a: 0.1 },
+      offset: { x: 0, y: 2 },
+      radius: 4,
+      visible: true
+    }];
+    frame.appendChild(moduleCard);
+
+    // Module title
+    const moduleTitle = figma.createText();
+    moduleTitle.characters = module.title;
+    moduleTitle.fontSize = 14;
+    moduleTitle.fontName = boldFont;
+    moduleTitle.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+    moduleTitle.x = 16;
+    moduleTitle.y = 16;
+    moduleCard.appendChild(moduleTitle);
+
+    // Progress text
+    const progressText = figma.createText();
+    progressText.characters = `İrəliləyiş: ${module.progress}%`;
+    progressText.fontSize = 12;
+    progressText.fontName = currentFont;
+    progressText.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#9ca3af' : '#6b7280') }];
+    progressText.x = 16;
+    progressText.y = 35;
+    moduleCard.appendChild(progressText);
+
+    // Progress bar
+    const progressBar = figma.createFrame();
+    progressBar.resize(283, 6);
+    progressBar.x = 16;
+    progressBar.y = 55;
+    progressBar.fills = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
+    progressBar.cornerRadius = 3;
+    moduleCard.appendChild(progressBar);
+
+    const progressFill = figma.createFrame();
+    progressFill.resize(283 * module.progress / 100, 6);
+    progressFill.x = 0;
+    progressFill.y = 0;
+    progressFill.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+    progressFill.cornerRadius = 3;
+    progressBar.appendChild(progressFill);
+
+    // Start button
+    const startButton = createButton('Başla', 'primary', isDark);
+    startButton.resize(80, 32);
+    startButton.x = 271;
+    startButton.y = 24;
+    moduleCard.appendChild(startButton);
+
+    moduleY += 100;
+  }
+
+  // Tab bar
+  const tabBar = createTabBar(1, isDark);
+  frame.appendChild(tabBar);
+}
+
+// Store dizaynı
+async function createStoreDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  // Header
+  const header = createHeader('Mağaza', isDark);
+  frame.appendChild(header);
+
+  // Books grid
+  const books = [
+    { title: 'Yol Hərəkəti Qaydaları', price: '12 AZN' },
+    { title: 'Yol Nişanları Atlası', price: '8 AZN' },
+    { title: 'Sürücülük Təcrübəsi', price: '15 AZN' },
+    { title: 'İmtahan Hazırlığı', price: '10 AZN' }
+  ];
+
+  let bookY = 100;
+  for (let i = 0; i < books.length; i += 2) {
+    for (let j = 0; j < 2 && i + j < books.length; j++) {
+      const book = books[i + j];
+      const bookCard = figma.createFrame();
+      bookCard.resize(160, 200);
+      bookCard.x = 20 + j * 175;
+      bookCard.y = bookY;
+      bookCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+      bookCard.cornerRadius = 12;
+      bookCard.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.1 },
+        offset: { x: 0, y: 2 },
+        radius: 4,
+        visible: true
+      }];
+      frame.appendChild(bookCard);
+
+      // Book image placeholder
+      const bookImage = figma.createFrame();
+      bookImage.resize(128, 96);
+      bookImage.x = 16;
+      bookImage.y = 16;
+      bookImage.fills = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
+      bookImage.cornerRadius = 8;
+      bookCard.appendChild(bookImage);
+
+      const bookEmoji = figma.createText();
+      bookEmoji.characters = '📚';
+      bookEmoji.fontSize = 32;
+      bookEmoji.fontName = currentFont;
+      bookEmoji.x = 48;
+      bookEmoji.y = 32;
+      bookImage.appendChild(bookEmoji);
+
+      // Book title
+      const bookTitle = figma.createText();
+      bookTitle.characters = book.title;
+      bookTitle.fontSize = 12;
+      bookTitle.fontName = boldFont;
+      bookTitle.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+      bookTitle.x = 16;
+      bookTitle.y = 125;
+      bookTitle.resize(128, 24);
+      bookCard.appendChild(bookTitle);
+
+      // Price
+      const price = figma.createText();
+      price.characters = book.price;
+      price.fontSize = 16;
+      price.fontName = boldFont;
+      price.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+      price.x = 16;
+      price.y = 155;
+      bookCard.appendChild(price);
+
+      // Buy button
+      const buyButton = createButton('Səbətə at', 'primary', isDark);
+      buyButton.resize(128, 28);
+      buyButton.x = 16;
+      buyButton.y = 180;
+      bookCard.appendChild(buyButton);
+    }
+    bookY += 220;
+  }
+
+  // Tab bar
+  const tabBar = createTabBar(3, isDark);
+  frame.appendChild(tabBar);
+}
+
+// More Menu dizaynı
+async function createMoreDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  // Header
+  const header = createHeader('Daha çox', isDark);
+  frame.appendChild(header);
+
+  // Balance info
+  const balanceCard = figma.createFrame();
+  balanceCard.resize(335, 60);
+  balanceCard.x = 20;
+  balanceCard.y = 80;
+  balanceCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+  balanceCard.cornerRadius = 12;
+  frame.appendChild(balanceCard);
+
+  const balanceText = figma.createText();
+  balanceText.characters = 'Balans: 100 AZN • Bilet: 3';
+  balanceText.fontSize = 14;
+  balanceText.fontName = boldFont;
+  balanceText.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+  balanceText.x = 16;
+  balanceText.y = 23;
+  balanceCard.appendChild(balanceText);
+
+  // Menu items
+  const menuItems = [
+    { title: 'Təlim paketləri', emoji: '📦' },
+    { title: 'Daxili balans', emoji: '💰' },
+    { title: 'Şəhadətnamə almaq', emoji: '🏆' },
+    { title: 'Praktiki təcrübə', emoji: '🚗' },
+    { title: 'Səhvlərim', emoji: '⚠️' },
+    { title: 'Sual-cavab', emoji: '❓' },
+    { title: 'Apellyasiyalarım', emoji: '📝' },
+    { title: 'Bildirişlər', emoji: '🔔' },
+    { title: 'Parametrlər', emoji: '⚙️' },
+    { title: 'Dəstək', emoji: '🆘' }
+  ];
+
+  let itemY = 160;
+  for (const item of menuItems) {
+    const menuCard = figma.createFrame();
+    menuCard.resize(335, 56);
+    menuCard.x = 20;
+    menuCard.y = itemY;
+    menuCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+    menuCard.cornerRadius = 12;
+    menuCard.effects = [{
+      type: 'DROP_SHADOW',
+      color: { r: 0, g: 0, b: 0, a: 0.05 },
+      offset: { x: 0, y: 1 },
+      radius: 2,
+      visible: true
+    }];
+    frame.appendChild(menuCard);
+
+    // Icon
+    const icon = figma.createText();
+    icon.characters = item.emoji;
+    icon.fontSize = 20;
+    icon.fontName = currentFont;
+    icon.x = 20;
+    icon.y = 18;
+    menuCard.appendChild(icon);
+
+    // Title
+    const title = figma.createText();
+    title.characters = item.title;
+    title.fontSize = 14;
+    title.fontName = currentFont;
+    title.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+    title.x = 60;
+    title.y = 21;
+    menuCard.appendChild(title);
+
+    // Arrow
+    const arrow = figma.createText();
+    arrow.characters = '›';
+    arrow.fontSize = 16;
+    arrow.fontName = currentFont;
+    arrow.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#9ca3af' : '#9ca3af') }];
+    arrow.x = 315;
+    arrow.y = 20;
+    menuCard.appendChild(arrow);
+
+    itemY += 66;
+  }
+
+  // Tab bar
+  const tabBar = createTabBar(4, isDark);
   frame.appendChild(tabBar);
 }
 
@@ -718,6 +1343,150 @@ async function createPackagesDesign(frame, isDark = false) {
   }
 }
 
+// Lesson dizaynı
+async function createLessonDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  // Header with back
+  const header = createHeaderWithBack('M8: Yol nişanları', isDark);
+  frame.appendChild(header);
+
+  // Video player
+  const videoPlayer = figma.createFrame();
+  videoPlayer.resize(335, 200);
+  videoPlayer.x = 20;
+  videoPlayer.y = 80;
+  videoPlayer.fills = [{ type: 'SOLID', color: hexToRgb('#000000') }];
+  videoPlayer.cornerRadius = 12;
+  frame.appendChild(videoPlayer);
+
+  // Play button
+  const playButton = figma.createFrame();
+  playButton.resize(60, 60);
+  playButton.x = 137.5;
+  playButton.y = 70;
+  playButton.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1, a: 0.9 } }];
+  playButton.cornerRadius = 30;
+  videoPlayer.appendChild(playButton);
+
+  const playIcon = figma.createText();
+  playIcon.characters = '▶';
+  playIcon.fontSize = 20;
+  playIcon.fontName = currentFont;
+  playIcon.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+  playIcon.x = 22;
+  playIcon.y = 20;
+  playButton.appendChild(playIcon);
+
+  // Lesson tabs
+  const tabsContainer = figma.createFrame();
+  tabsContainer.resize(335, 40);
+  tabsContainer.x = 20;
+  tabsContainer.y = 300;
+  tabsContainer.fills = [];
+  tabsContainer.layoutMode = 'HORIZONTAL';
+  tabsContainer.itemSpacing = 8;
+  frame.appendChild(tabsContainer);
+
+  const tabs = ['Video', 'Maddə', 'Suallar'];
+  for (let i = 0; i < tabs.length; i++) {
+    const tab = createButton(tabs[i], i === 0 ? 'primary' : 'secondary', isDark);
+    tab.resize(105, 32);
+    tabsContainer.appendChild(tab);
+  }
+
+  // Content area
+  const contentCard = figma.createFrame();
+  contentCard.resize(335, 200);
+  contentCard.x = 20;
+  contentCard.y = 360;
+  contentCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+  contentCard.cornerRadius = 12;
+  frame.appendChild(contentCard);
+
+  const contentText = figma.createText();
+  contentText.characters = 'Video dərs məzmunu burada göstərilir. Offline saxlama və müəllimlə əlaqə funksiyaları mövcuddur.';
+  contentText.fontSize = 14;
+  contentText.fontName = currentFont;
+  contentText.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#d1d5db' : '#374151') }];
+  contentText.x = 16;
+  contentText.y = 16;
+  contentText.resize(303, 60);
+  contentCard.appendChild(contentText);
+
+  // Action buttons
+  const actionY = 600;
+  const practiceButton = createButton('📝 Suallar', 'primary', isDark);
+  practiceButton.resize(160, 44);
+  practiceButton.x = 20;
+  practiceButton.y = actionY;
+  frame.appendChild(practiceButton);
+
+  const examButton = createButton('🧪 İmtahan', 'primary', isDark);
+  examButton.resize(160, 44);
+  examButton.x = 195;
+  examButton.y = actionY;
+  frame.appendChild(examButton);
+}
+
+// Exam Config dizaynı
+async function createExamConfigDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  // Header
+  const header = createHeaderWithBack('İmtahan Tənzimləmələri', isDark);
+  frame.appendChild(header);
+
+  // Config card
+  const configCard = figma.createFrame();
+  configCard.resize(335, 300);
+  configCard.x = 20;
+  configCard.y = 100;
+  configCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+  configCard.cornerRadius = 16;
+  configCard.layoutMode = 'VERTICAL';
+  configCard.itemSpacing = 20;
+  configCard.paddingTop = 24;
+  configCard.paddingBottom = 24;
+  configCard.paddingLeft = 20;
+  configCard.paddingRight = 20;
+  frame.appendChild(configCard);
+
+  // Exam type
+  const typeLabel = figma.createText();
+  typeLabel.characters = 'İmtahan növü:';
+  typeLabel.fontSize = 14;
+  typeLabel.fontName = boldFont;
+  typeLabel.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+  configCard.appendChild(typeLabel);
+
+  const simulatorButton = createButton('🧪 İmtahan Simulyatoru', 'primary', isDark);
+  configCard.appendChild(simulatorButton);
+
+  const finalButton = createButton('📋 Yekun İmtahan', 'secondary', isDark);
+  configCard.appendChild(finalButton);
+
+  // Questions count
+  const countLabel = figma.createText();
+  countLabel.characters = 'Sual sayı: 10';
+  countLabel.fontSize = 14;
+  countLabel.fontName = boldFont;
+  countLabel.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+  configCard.appendChild(countLabel);
+
+  // Start button
+  const startButton = createButton('İmtahana Başla', 'primary', isDark);
+  startButton.y = 450;
+  startButton.x = 40;
+  frame.appendChild(startButton);
+}
+
 // AI Chat dizaynı
 async function createAIChatDesign(frame, isDark = false) {
   const bgColor = isDark ? '#111827' : '#f9fafb';
@@ -796,6 +1565,432 @@ async function createAIChatDesign(frame, isDark = false) {
   sendButton.x = 279;
   sendButton.y = 18;
   inputArea.appendChild(sendButton);
+}
+
+// Settings dizaynı
+async function createSettingsDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  // Header
+  const header = createHeaderWithBack('Parametrlər', isDark);
+  frame.appendChild(header);
+
+  // Profile card
+  const profileCard = figma.createFrame();
+  profileCard.resize(335, 80);
+  profileCard.x = 20;
+  profileCard.y = 80;
+  profileCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+  profileCard.cornerRadius = 12;
+  frame.appendChild(profileCard);
+
+  // Avatar
+  const avatar = figma.createFrame();
+  avatar.resize(48, 48);
+  avatar.x = 16;
+  avatar.y = 16;
+  avatar.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+  avatar.cornerRadius = 24;
+  profileCard.appendChild(avatar);
+
+  const avatarText = figma.createText();
+  avatarText.characters = 'T';
+  avatarText.fontSize = 20;
+  avatarText.fontName = boldFont;
+  avatarText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  avatarText.x = 18;
+  avatarText.y = 14;
+  avatar.appendChild(avatarText);
+
+  // Profile info
+  const profileName = figma.createText();
+  profileName.characters = 'Tural Qarayev';
+  profileName.fontSize = 16;
+  profileName.fontName = boldFont;
+  profileName.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+  profileName.x = 80;
+  profileName.y = 20;
+  profileCard.appendChild(profileName);
+
+  const profileEmail = figma.createText();
+  profileEmail.characters = 'tural@example.com';
+  profileEmail.fontSize = 12;
+  profileEmail.fontName = currentFont;
+  profileEmail.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#9ca3af' : '#6b7280') }];
+  profileEmail.x = 80;
+  profileEmail.y = 40;
+  profileCard.appendChild(profileEmail);
+
+  // Settings sections
+  const settingsItems = [
+    { section: 'Hesabım', items: ['👤 Profil məlumatları', '🔒 Təhlükəsizlik', '🛡️ Məxfilik'] },
+    { section: 'Tətbiq', items: ['📱 Offline məzmun', '🗑️ Keş təmizlə', '🔄 Yeniləmələr'] },
+    { section: 'Dəstək', items: ['❓ Kömək mərkəzi', '📞 Bizimlə əlaqə', '💬 Rəy bildirin'] }
+  ];
+
+  let sectionY = 180;
+  for (const section of settingsItems) {
+    // Section header
+    const sectionHeader = figma.createText();
+    sectionHeader.characters = section.section;
+    sectionHeader.fontSize = 14;
+    sectionHeader.fontName = boldFont;
+    sectionHeader.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#d1d5db' : '#6b7280') }];
+    sectionHeader.x = 20;
+    sectionHeader.y = sectionY;
+    frame.appendChild(sectionHeader);
+
+    sectionY += 30;
+
+    // Section items
+    for (const item of section.items) {
+      const itemCard = figma.createFrame();
+      itemCard.resize(335, 50);
+      itemCard.x = 20;
+      itemCard.y = sectionY;
+      itemCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+      itemCard.cornerRadius = 8;
+      frame.appendChild(itemCard);
+
+      const itemText = figma.createText();
+      itemText.characters = item;
+      itemText.fontSize = 14;
+      itemText.fontName = currentFont;
+      itemText.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+      itemText.x = 16;
+      itemText.y = 18;
+      itemCard.appendChild(itemText);
+
+      const arrow = figma.createText();
+      arrow.characters = '›';
+      arrow.fontSize = 16;
+      arrow.fontName = currentFont;
+      arrow.fills = [{ type: 'SOLID', color: hexToRgb('#9ca3af') }];
+      arrow.x = 315;
+      arrow.y = 17;
+      itemCard.appendChild(arrow);
+
+      sectionY += 60;
+    }
+
+    sectionY += 20;
+  }
+}
+
+// Practice dizaynı
+async function createPracticeDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  // Header
+  const header = createHeaderWithBack('Sürətli Test', isDark);
+  frame.appendChild(header);
+
+  // Question card
+  const questionCard = figma.createFrame();
+  questionCard.resize(335, 500);
+  questionCard.x = 20;
+  questionCard.y = 100;
+  questionCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+  questionCard.cornerRadius = 16;
+  frame.appendChild(questionCard);
+
+  // Question number
+  const questionNumber = figma.createText();
+  questionNumber.characters = '1/5';
+  questionNumber.fontSize = 12;
+  questionNumber.fontName = currentFont;
+  questionNumber.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#9ca3af' : '#6b7280') }];
+  questionNumber.x = 16;
+  questionNumber.y = 16;
+  questionCard.appendChild(questionNumber);
+
+  // Question text
+  const questionText = figma.createText();
+  questionText.characters = 'Sarı işıq yananda sürücü nə etməlidir?';
+  questionText.fontSize = 16;
+  questionText.fontName = boldFont;
+  questionText.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+  questionText.x = 16;
+  questionText.y = 40;
+  questionText.resize(303, 40);
+  questionCard.appendChild(questionText);
+
+  // Question image
+  const questionImage = figma.createFrame();
+  questionImage.resize(303, 150);
+  questionImage.x = 16;
+  questionImage.y = 90;
+  questionImage.fills = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
+  questionImage.cornerRadius = 8;
+  questionCard.appendChild(questionImage);
+
+  const imageIcon = figma.createText();
+  imageIcon.characters = '🚦';
+  imageIcon.fontSize = 48;
+  imageIcon.fontName = currentFont;
+  imageIcon.x = 127.5;
+  imageIcon.y = 51;
+  questionImage.appendChild(imageIcon);
+
+  // Answer options
+  const options = [
+    'Sürəti artırıb keçmək',
+    'Yavaşlayıb dayanmağa hazırlaşmaq',
+    'Dərhal dayanmaq',
+    'Siqnal vermək'
+  ];
+
+  let optionY = 260;
+  for (let i = 0; i < options.length; i++) {
+    const optionCard = figma.createFrame();
+    optionCard.resize(303, 40);
+    optionCard.x = 16;
+    optionCard.y = optionY;
+    optionCard.fills = [{ type: 'SOLID', color: hexToRgb(i === 1 ? '#f0fdf4' : (isDark ? '#374151' : '#f9fafb')) }];
+    optionCard.cornerRadius = 8;
+    optionCard.strokes = [{ type: 'SOLID', color: hexToRgb(i === 1 ? '#22c55e' : '#e5e7eb') }];
+    optionCard.strokeWeight = 1;
+    questionCard.appendChild(optionCard);
+
+    // Radio button
+    const radio = figma.createFrame();
+    radio.resize(16, 16);
+    radio.x = 12;
+    radio.y = 12;
+    radio.fills = [{ type: 'SOLID', color: hexToRgb(i === 1 ? '#22c55e' : '#ffffff') }];
+    radio.cornerRadius = 8;
+    radio.strokes = [{ type: 'SOLID', color: hexToRgb(i === 1 ? '#22c55e' : '#d1d5db') }];
+    radio.strokeWeight = 2;
+    optionCard.appendChild(radio);
+
+    if (i === 1) {
+      const radioCheck = figma.createFrame();
+      radioCheck.resize(6, 6);
+      radioCheck.x = 5;
+      radioCheck.y = 5;
+      radioCheck.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+      radioCheck.cornerRadius = 3;
+      radio.appendChild(radioCheck);
+    }
+
+    // Option text
+    const optionText = figma.createText();
+    optionText.characters = options[i];
+    optionText.fontSize = 14;
+    optionText.fontName = currentFont;
+    optionText.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#d1d5db' : '#374151') }];
+    optionText.x = 40;
+    optionText.y = 13;
+    optionCard.appendChild(optionText);
+
+    optionY += 50;
+  }
+
+  // Action buttons
+  const confirmButton = createButton('Cavabı Təsdiq Et', 'primary', isDark);
+  confirmButton.resize(160, 40);
+  confirmButton.x = 20;
+  confirmButton.y = 620;
+  frame.appendChild(confirmButton);
+
+  const nextButton = createButton('Sonrakı', 'secondary', isDark);
+  nextButton.resize(160, 40);
+  nextButton.x = 195;
+  nextButton.y = 620;
+  frame.appendChild(nextButton);
+}
+
+// Exam Running dizaynı
+async function createExamRunningDesign(frame, isDark = false) {
+  frame.fills = [{ type: 'SOLID', color: hexToRgb('#111827') }]; // Dark exam mode
+
+  // Header with timer
+  const header = figma.createFrame();
+  header.resize(375, 60);
+  header.x = 0;
+  header.y = 0;
+  header.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0, a: 0.8 } }];
+  frame.appendChild(header);
+
+  const timer = figma.createText();
+  timer.characters = '⏱️ 14:34';
+  timer.fontSize = 18;
+  timer.fontName = boldFont;
+  timer.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  timer.textAlignHorizontal = 'CENTER';
+  timer.x = 137.5;
+  timer.y = 21;
+  timer.resize(100, 18);
+  header.appendChild(timer);
+
+  // Questions grid
+  const questions = Array.from({ length: 10 }, (_, i) => ({
+    number: i + 1,
+    answered: i < 3
+  }));
+
+  let questionY = 80;
+  for (let i = 0; i < questions.length; i += 2) {
+    for (let j = 0; j < 2 && i + j < questions.length; j++) {
+      const q = questions[i + j];
+      const questionThumb = figma.createFrame();
+      questionThumb.resize(160, 120);
+      questionThumb.x = 20 + j * 175;
+      questionThumb.y = questionY;
+      questionThumb.fills = [{ type: 'SOLID', color: hexToRgb('#374151') }];
+      questionThumb.cornerRadius = 12;
+      frame.appendChild(questionThumb);
+
+      // Question number
+      const qNumber = figma.createText();
+      qNumber.characters = q.number.toString();
+      qNumber.fontSize = 16;
+      qNumber.fontName = boldFont;
+      qNumber.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+      qNumber.x = 16;
+      qNumber.y = 16;
+      questionThumb.appendChild(qNumber);
+
+      // Answered indicator
+      if (q.answered) {
+        const checkmark = figma.createFrame();
+        checkmark.resize(24, 24);
+        checkmark.x = 120;
+        checkmark.y = 12;
+        checkmark.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+        checkmark.cornerRadius = 12;
+        questionThumb.appendChild(checkmark);
+
+        const check = figma.createText();
+        check.characters = '✓';
+        check.fontSize = 14;
+        check.fontName = boldFont;
+        check.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+        check.x = 7;
+        check.y = 5;
+        checkmark.appendChild(check);
+      }
+
+      // Question preview
+      const preview = figma.createText();
+      preview.characters = 'Sual məzmunu...';
+      preview.fontSize = 12;
+      preview.fontName = currentFont;
+      preview.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1, a: 0.7 } }];
+      preview.x = 16;
+      preview.y = 90;
+      questionThumb.appendChild(preview);
+    }
+    questionY += 140;
+  }
+
+  // Current question detail
+  const currentCard = figma.createFrame();
+  currentCard.resize(335, 200);
+  currentCard.x = 20;
+  currentCard.y = 580;
+  currentCard.fills = [{ type: 'SOLID', color: hexToRgb('#1f2937') }];
+  currentCard.cornerRadius = 16;
+  frame.appendChild(currentCard);
+
+  const currentQuestion = figma.createText();
+  currentQuestion.characters = '4. Sarı işıq yananda sürücü nə etməlidir?';
+  currentQuestion.fontSize = 14;
+  currentQuestion.fontName = boldFont;
+  currentQuestion.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  currentQuestion.x = 16;
+  currentQuestion.y = 16;
+  currentQuestion.resize(303, 28);
+  currentCard.appendChild(currentQuestion);
+
+  // Quick options
+  const quickOptions = ['A) Sürəti artır', 'B) Yavaşla', 'C) Dərhal dayana', 'D) Siqnal ver'];
+  let optY = 60;
+  for (const opt of quickOptions) {
+    const optText = figma.createText();
+    optText.characters = opt;
+    optText.fontSize = 12;
+    optText.fontName = currentFont;
+    optText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1, a: 0.8 } }];
+    optText.x = 16;
+    optText.y = optY;
+    currentCard.appendChild(optText);
+    optY += 25;
+  }
+}
+
+// Results dizaynı
+async function createResultsDesign(frame, passed, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  // Header
+  const header = createHeaderWithBack('İmtahan Nəticəsi', isDark);
+  frame.appendChild(header);
+
+  // Result card
+  const resultCard = figma.createFrame();
+  resultCard.resize(335, 200);
+  resultCard.x = 20;
+  resultCard.y = 150;
+  resultCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+  resultCard.cornerRadius = 16;
+  frame.appendChild(resultCard);
+
+  // Score
+  const score = figma.createText();
+  score.characters = passed ? '8/10' : '5/10';
+  score.fontSize = 48;
+  score.fontName = boldFont;
+  score.fills = [{ type: 'SOLID', color: hexToRgb(passed ? '#22c55e' : '#ef4444') }];
+  score.textAlignHorizontal = 'CENTER';
+  score.x = 117.5;
+  score.y = 40;
+  score.resize(100, 48);
+  resultCard.appendChild(score);
+
+  // Result text
+  const resultText = figma.createText();
+  resultText.characters = passed ? '🎉 Keçdiniz!' : '😔 Keçmədiniz';
+  resultText.fontSize = 20;
+  resultText.fontName = boldFont;
+  resultText.fills = [{ type: 'SOLID', color: hexToRgb(passed ? '#22c55e' : '#ef4444') }];
+  resultText.textAlignHorizontal = 'CENTER';
+  resultText.x = 67.5;
+  resultText.y = 100;
+  resultText.resize(200, 20);
+  resultCard.appendChild(resultText);
+
+  // Time spent
+  const timeText = figma.createText();
+  timeText.characters = 'Vaxt: 12:45';
+  timeText.fontSize = 14;
+  timeText.fontName = currentFont;
+  timeText.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#9ca3af' : '#6b7280') }];
+  timeText.textAlignHorizontal = 'CENTER';
+  timeText.x = 117.5;
+  timeText.y = 130;
+  timeText.resize(100, 14);
+  resultCard.appendChild(timeText);
+
+  // Action buttons
+  const retryButton = createButton('Yenidən Cəhd Et', 'primary', isDark);
+  retryButton.x = 40;
+  retryButton.y = 400;
+  frame.appendChild(retryButton);
+
+  const mistakesButton = createButton('Səhvləri Göstər', 'secondary', isDark);
+  mistakesButton.x = 40;
+  mistakesButton.y = 460;
+  frame.appendChild(mistakesButton);
 }
 
 // Flow Map yaradıcısı
@@ -977,6 +2172,9 @@ function createButton(text, variant = 'primary', isDark = false) {
   if (variant === 'primary') {
     bgColor = '#22c55e';
     textColor = '#ffffff';
+  } else if (variant === 'disabled') {
+    bgColor = isDark ? '#374151' : '#e5e7eb';
+    textColor = isDark ? '#6b7280' : '#9ca3af';
   } else {
     bgColor = isDark ? '#374151' : '#f3f4f6';
     textColor = isDark ? '#f9fafb' : '#374151';
@@ -1122,6 +2320,51 @@ function createChatHeader(isDark = false) {
   header.appendChild(status);
 
   return header;
+}
+
+// Digər ekranlar üçün placeholder funksiyalar
+async function createPackageDetailsDesign(frame, isDark = false) {
+  await createDefaultDesign(frame, { name: 'Package Details', category: 'Purchase' });
+}
+
+async function createPaymentDesign(frame, isDark = false) {
+  await createDefaultDesign(frame, { name: 'Payment Methods', category: 'Purchase' });
+}
+
+async function createSuccessDesign(frame, isDark = false) {
+  await createDefaultDesign(frame, { name: 'Purchase Success', category: 'Purchase' });
+}
+
+async function createVideoDesign(frame, isDark = false) {
+  await createDefaultDesign(frame, { name: 'Video Player', category: 'Learning' });
+}
+
+async function createTeacherDesign(frame, isDark = false) {
+  await createDefaultDesign(frame, { name: 'Teacher Contact', category: 'Learning' });
+}
+
+async function createChatHistoryDesign(frame, isDark = false) {
+  await createDefaultDesign(frame, { name: 'Chat History', category: 'Support' });
+}
+
+async function createNotificationsDesign(frame, isDark = false) {
+  await createDefaultDesign(frame, { name: 'Notifications', category: 'Support' });
+}
+
+async function createProfileEditDesign(frame, isDark = false) {
+  await createDefaultDesign(frame, { name: 'Profile Edit', category: 'Profile' });
+}
+
+async function createTransactionsDesign(frame, isDark = false) {
+  await createDefaultDesign(frame, { name: 'Transactions', category: 'Profile' });
+}
+
+async function createBalanceDesign(frame, isDark = false) {
+  await createDefaultDesign(frame, { name: 'Balance Top-up', category: 'Profile' });
+}
+
+async function createMistakesDesign(frame, isDark = false) {
+  await createDefaultDesign(frame, { name: 'Mistakes Review', category: 'Exam' });
 }
 
 function createDefaultDesign(frame, screen) {
