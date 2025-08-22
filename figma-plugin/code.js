@@ -1,548 +1,518 @@
-// DDA.az Figma Plugin - Tam Dizayn Versiyası
-// Bu plugin hər ekranın tam dizaynını yaradır
+// DDA.az Design Exporter Plugin - Tam Dizayn Sistemi
+// Bu plugin 34 mobil ekran + design system + flow map yaradır
 
-console.log('🚀 DDA.az Plugin başladı - Tam Dizayn Modu');
+console.log('🚀 DDA.az Design Exporter başladı');
 
-// Figma API-nin hazır olmasını yoxla
-if (typeof figma === 'undefined') {
-  console.error('❌ Figma API mövcud deyil');
-} else {
-  console.log('✅ Figma API hazırdır');
-}
-
-// Plugin mesajlarını dinlə
+// Plugin UI-ni göstər
 figma.showUI(__html__, { 
-  width: 450, 
-  height: 700,
+  width: 400, 
+  height: 600,
   themeColors: true 
 });
 
-// UI mesajlarını emal et
+// Global dəyişənlər
+let currentFont = { family: 'Inter', style: 'Regular' };
+let boldFont = { family: 'Inter', style: 'Bold' };
+
+// UI mesajlarını dinlə
 figma.ui.onmessage = async (msg) => {
   console.log('📨 Mesaj alındı:', msg.type);
   
   try {
     switch (msg.type) {
-      case 'create-colors':
-        await createColorSystem();
-        break;
-      case 'create-typography':
-        await createTypographySystem();
-        break;
-      case 'create-components':
-        await createComponents();
-        break;
-      case 'create-screens':
-        await createDetailedScreens();
-        break;
       case 'create-all':
         await createEverything();
+        break;
+      case 'create-styles':
+        await createStylesOnly();
+        break;
+      case 'regenerate':
+        await regenerateAll();
+        break;
+      case 'create-flow':
+        await createFlowMap();
         break;
       case 'close':
         figma.closePlugin();
         break;
       default:
-        console.log('⚠️ Naməlum mesaj növü:', msg.type);
+        console.log('⚠️ Naməlum mesaj:', msg.type);
     }
   } catch (error) {
-    console.error('❌ Xəta baş verdi:', error);
+    console.error('❌ Xəta:', error);
     figma.notify('❌ Xəta: ' + error.message, { error: true });
+    figma.ui.postMessage({ type: 'error', message: error.message });
   }
 };
 
-// Rəng sistemi yaradıcısı
-async function createColorSystem() {
-  console.log('🎨 Rəng sistemi yaradılır...');
-  
+// Font yükləyici
+async function loadFonts() {
   try {
-    const colors = {
-      primary: {
-        50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80',
-        500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d'
-      },
-      gray: {
-        50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 300: '#d1d5db', 400: '#9ca3af',
-        500: '#6b7280', 600: '#4b5563', 700: '#374151', 800: '#1f2937', 900: '#111827'
-      },
-      emerald: {
-        50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399',
-        500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b'
-      },
-      red: {
-        50: '#fef2f2', 100: '#fee2e2', 200: '#fecaca', 300: '#fca5a5', 400: '#f87171',
-        500: '#ef4444', 600: '#dc2626', 700: '#b91c1c', 800: '#991b1b', 900: '#7f1d1d'
-      },
-      blue: {
-        50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa',
-        500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a'
-      }
-    };
-
-    // Rəng stilləri yarat
-    for (const [colorName, shades] of Object.entries(colors)) {
-      for (const [shade, hex] of Object.entries(shades)) {
-        const style = figma.createPaintStyle();
-        style.name = `Colors/${colorName}/${shade}`;
-        style.paints = [{
-          type: 'SOLID',
-          color: hexToRgb(hex)
-        }];
+    const availableFonts = await figma.listAvailableFontsAsync();
+    
+    // Inter fontunu tap
+    const interRegular = availableFonts.find(f => 
+      f.fontName.family === 'Inter' && f.fontName.style === 'Regular'
+    );
+    const interBold = availableFonts.find(f => 
+      f.fontName.family === 'Inter' && f.fontName.style === 'Bold'
+    );
+    
+    if (interRegular) {
+      currentFont = interRegular.fontName;
+      await figma.loadFontAsync(currentFont);
+      console.log('✅ Inter Regular yükləndi');
+    }
+    
+    if (interBold) {
+      boldFont = interBold.fontName;
+      await figma.loadFontAsync(boldFont);
+      console.log('✅ Inter Bold yükləndi');
+    }
+    
+    // Fallback fontlar
+    if (!interRegular) {
+      const fallbacks = ['Roboto', 'Arial', 'Helvetica'];
+      for (const fontFamily of fallbacks) {
+        const found = availableFonts.find(f => f.fontName.family === fontFamily);
+        if (found) {
+          currentFont = found.fontName;
+          await figma.loadFontAsync(currentFont);
+          console.log(`✅ Fallback font yükləndi: ${fontFamily}`);
+          break;
+        }
       }
     }
-
-    figma.notify('✅ 25 rəng stili yaradıldı!');
-    console.log('✅ Rəng sistemi tamamlandı');
     
   } catch (error) {
-    console.error('❌ Rəng sistemi xətası:', error);
-    figma.notify('❌ Rəng sistemi xətası: ' + error.message, { error: true });
+    console.error('❌ Font yükləmə xətası:', error);
+    figma.notify('⚠️ Font yükləmə problemi', { error: true });
   }
+}
+
+// Rəng sistemi yaradıcısı
+async function createColorStyles() {
+  console.log('🎨 Rəng stilləri yaradılır...');
+  
+  const colors = {
+    // Light theme
+    'Light/Background': '#f9fafb',
+    'Light/Surface': '#ffffff',
+    'Light/Text Primary': '#111827',
+    'Light/Text Secondary': '#6b7280',
+    'Light/Text Muted': '#9ca3af',
+    'Light/Brand': '#22c55e',
+    'Light/Brand Alt': '#16a34a',
+    'Light/Border': '#e5e7eb',
+    'Light/Accent': '#3b82f6',
+    'Light/Danger': '#ef4444',
+    
+    // Dark theme
+    'Dark/Background': '#111827',
+    'Dark/Surface': '#1f2937',
+    'Dark/Text Primary': '#f9fafb',
+    'Dark/Text Secondary': '#d1d5db',
+    'Dark/Text Muted': '#9ca3af',
+    'Dark/Brand': '#34d399',
+    'Dark/Brand Alt': '#10b981',
+    'Dark/Border': '#374151',
+    'Dark/Accent': '#60a5fa',
+    'Dark/Danger': '#f87171',
+    
+    // Brand colors
+    'Brand/Primary 50': '#f0fdf4',
+    'Brand/Primary 100': '#dcfce7',
+    'Brand/Primary 200': '#bbf7d0',
+    'Brand/Primary 300': '#86efac',
+    'Brand/Primary 400': '#4ade80',
+    'Brand/Primary 500': '#22c55e',
+    'Brand/Primary 600': '#16a34a',
+    'Brand/Primary 700': '#15803d',
+    'Brand/Primary 800': '#166534',
+    'Brand/Primary 900': '#14532d'
+  };
+
+  for (const [name, hex] of Object.entries(colors)) {
+    const style = figma.createPaintStyle();
+    style.name = name;
+    style.paints = [{
+      type: 'SOLID',
+      color: hexToRgb(hex)
+    }];
+  }
+  
+  console.log('✅ 30 rəng stili yaradıldı');
 }
 
 // Typography sistemi yaradıcısı
-async function createTypographySystem() {
-  console.log('📝 Typography sistemi yaradılır...');
+async function createTextStyles() {
+  console.log('📝 Text stilləri yaradılır...');
   
-  try {
-    // Mövcud fontları yoxla
-    const availableFonts = await figma.listAvailableFontsAsync();
-    console.log('📋 Mövcud fontlar:', availableFonts.length);
-    
-    // Uyğun font tap
-    let selectedFont = { family: 'Inter', style: 'Regular' };
-    
-    const fontPriority = ['Inter', 'Roboto', 'Arial', 'Helvetica'];
-    for (const fontFamily of fontPriority) {
-      const found = availableFonts.find(f => f.fontName.family === fontFamily);
-      if (found) {
-        selectedFont = found.fontName;
-        console.log('✅ Font tapıldı:', fontFamily);
-        break;
-      }
-    }
+  const textStyles = [
+    { name: 'Typography/H1', size: 28, lineHeight: 36, weight: 'Bold' },
+    { name: 'Typography/H2', size: 22, lineHeight: 30, weight: 'Bold' },
+    { name: 'Typography/H3', size: 18, lineHeight: 24, weight: 'Bold' },
+    { name: 'Typography/Body', size: 16, lineHeight: 24, weight: 'Regular' },
+    { name: 'Typography/Body Small', size: 14, lineHeight: 20, weight: 'Regular' },
+    { name: 'Typography/Caption', size: 12, lineHeight: 16, weight: 'Regular' }
+  ];
 
-    // Font yüklə
-    await figma.loadFontAsync(selectedFont);
-    console.log('✅ Font yükləndi:', selectedFont.family);
-
-    const textStyles = [
-      { name: 'Heading/H1', size: 24, weight: 'Bold' },
-      { name: 'Heading/H2', size: 20, weight: 'SemiBold' },
-      { name: 'Body/Large', size: 16, weight: 'Regular' },
-      { name: 'Body/Medium', size: 14, weight: 'Regular' },
-      { name: 'Body/Small', size: 12, weight: 'Regular' },
-      { name: 'Caption', size: 11, weight: 'Regular' }
-    ];
-
-    for (const textStyle of textStyles) {
-      try {
-        // Font variantını yoxla
-        let fontToUse = selectedFont;
-        if (textStyle.weight !== 'Regular') {
-          const weightFont = availableFonts.find(f => 
-            f.fontName.family === selectedFont.family && 
-            f.fontName.style.includes(textStyle.weight)
-          );
-          if (weightFont) {
-            fontToUse = weightFont.fontName;
-            await figma.loadFontAsync(fontToUse);
-          }
-        }
-
-        const style = figma.createTextStyle();
-        style.name = `Typography/${textStyle.name}`;
-        style.fontSize = textStyle.size;
-        style.fontName = fontToUse;
-        
-        console.log(`✅ Text stili yaradıldı: ${textStyle.name}`);
-      } catch (styleError) {
-        console.warn(`⚠️ Text stili xətası: ${textStyle.name}`, styleError);
-      }
-    }
-
-    figma.notify('✅ 6 typography stili yaradıldı!');
-    console.log('✅ Typography sistemi tamamlandı');
-    
-  } catch (error) {
-    console.error('❌ Typography sistemi xətası:', error);
-    figma.notify('❌ Typography xətası: ' + error.message, { error: true });
+  for (const textStyle of textStyles) {
+    const style = figma.createTextStyle();
+    style.name = textStyle.name;
+    style.fontSize = textStyle.size;
+    style.lineHeight = { value: textStyle.lineHeight, unit: 'PIXELS' };
+    style.fontName = textStyle.weight === 'Bold' ? boldFont : currentFont;
   }
+  
+  console.log('✅ 6 text stili yaradıldı');
 }
 
-// Komponentlər yaradıcısı
-async function createComponents() {
-  console.log('🧩 Komponentlər yaradılır...');
+// Hər şeyi yarat
+async function createEverything() {
+  figma.ui.postMessage({ type: 'progress', message: '🚀 Başlanır...', progress: 5 });
   
-  try {
-    // Komponent səhifəsi yarat
-    const componentPage = figma.createPage();
-    componentPage.name = '🧩 Components';
-    figma.currentPage = componentPage;
-
-    let yPos = 0;
-
-    // Button komponenti
-    const buttonFrame = figma.createFrame();
-    buttonFrame.name = 'Button/Primary';
-    buttonFrame.resize(120, 44);
-    buttonFrame.x = 0;
-    buttonFrame.y = yPos;
-    buttonFrame.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
-    buttonFrame.cornerRadius = 12;
-
-    // Button text
-    const buttonText = figma.createText();
-    buttonText.characters = 'Button';
-    buttonText.fontSize = 14;
-    buttonText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-    buttonText.x = 40;
-    buttonText.y = 15;
-    buttonFrame.appendChild(buttonText);
-
-    // Button komponentini yarat
-    const buttonComponent = figma.createComponent();
-    buttonComponent.name = 'Button/Primary';
-    buttonComponent.appendChild(buttonFrame);
-
-    yPos += 80;
-
-    // Card komponenti
-    const cardFrame = figma.createFrame();
-    cardFrame.name = 'Card/Default';
-    cardFrame.resize(300, 200);
-    cardFrame.x = 0;
-    cardFrame.y = yPos;
-    cardFrame.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-    cardFrame.cornerRadius = 16;
-    cardFrame.effects = [{
-      type: 'DROP_SHADOW',
-      color: { r: 0, g: 0, b: 0, a: 0.1 },
-      offset: { x: 0, y: 4 },
-      radius: 6,
-      visible: true
-    }];
-
-    const cardComponent = figma.createComponent();
-    cardComponent.name = 'Card/Default';
-    cardComponent.appendChild(cardFrame);
-
-    figma.notify('✅ 8 komponent yaradıldı!');
-    console.log('✅ Komponentlər tamamlandı');
-    
-  } catch (error) {
-    console.error('❌ Komponent xətası:', error);
-    figma.notify('❌ Komponent xətası: ' + error.message, { error: true });
-  }
+  await loadFonts();
+  figma.ui.postMessage({ type: 'progress', message: '🎨 Rəng stilləri...', progress: 15 });
+  
+  await createColorStyles();
+  figma.ui.postMessage({ type: 'progress', message: '📝 Text stilləri...', progress: 25 });
+  
+  await createTextStyles();
+  figma.ui.postMessage({ type: 'progress', message: '📱 Ekranlar yaradılır...', progress: 40 });
+  
+  await createAllScreens();
+  figma.ui.postMessage({ type: 'progress', message: '🌙 Dark variantlar...', progress: 85 });
+  
+  await createDarkVariants();
+  figma.ui.postMessage({ type: 'progress', message: '✅ Tamamlandı!', progress: 100 });
+  
+  figma.notify('🎉 34 ekran + design system yaradıldı!');
 }
 
-// Detallı ekranlar yaradıcısı
-async function createDetailedScreens() {
-  console.log('📱 30 detallı ekran yaradılır...');
+// Yalnız stillər yarat
+async function createStylesOnly() {
+  figma.ui.postMessage({ type: 'progress', message: '🎨 Stillər yaradılır...', progress: 20 });
   
-  try {
-    // Ekranlar səhifəsi yarat
-    const screensPage = figma.createPage();
-    screensPage.name = '📱 Screens (30 Detallı)';
-    figma.currentPage = screensPage;
-
-    // Font yüklə
-    const availableFonts = await figma.listAvailableFontsAsync();
-    let selectedFont = { family: 'Inter', style: 'Regular' };
-    
-    const fontPriority = ['Inter', 'Roboto', 'Arial', 'Helvetica'];
-    for (const fontFamily of fontPriority) {
-      const found = availableFonts.find(f => f.fontName.family === fontFamily);
-      if (found) {
-        selectedFont = found.fontName;
-        break;
-      }
-    }
-    await figma.loadFontAsync(selectedFont);
-
-    const screens = [
-      // Auth Flow
-      { name: '01. Login', category: 'Auth', color: '#3b82f6', design: 'login' },
-      
-      // Main Flow (No Package)
-      { name: '02. Home (No Package)', category: 'Main', color: '#6b7280', design: 'home-no-package' },
-      { name: '03. Topics (Locked)', category: 'Main', color: '#6b7280', design: 'topics-locked' },
-      { name: '04. Store', category: 'Main', color: '#6b7280', design: 'store' },
-      { name: '05. More Menu', category: 'Main', color: '#6b7280', design: 'more-menu' },
-      
-      // Purchase Flow
-      { name: '06. Packages List', category: 'Purchase', color: '#10b981', design: 'packages-list' },
-      { name: '07. Package Details', category: 'Purchase', color: '#10b981', design: 'package-details' },
-      { name: '08. Payment', category: 'Purchase', color: '#10b981', design: 'payment' },
-      { name: '09. Purchase Success', category: 'Purchase', color: '#10b981', design: 'purchase-success' },
-      
-      // Premium Flow (With Package)
-      { name: '10. Home (Premium)', category: 'Premium', color: '#059669', design: 'home-premium' },
-      { name: '11. Topics (Unlocked)', category: 'Premium', color: '#059669', design: 'topics-unlocked' },
-      
-      // Learning Flow
-      { name: '12. Lesson View', category: 'Learning', color: '#f59e0b', design: 'lesson-view' },
-      { name: '13. Video Player', category: 'Learning', color: '#f59e0b', design: 'video-player' },
-      { name: '14. Practice Questions', category: 'Learning', color: '#f59e0b', design: 'practice-questions' },
-      { name: '15. Materials', category: 'Learning', color: '#f59e0b', design: 'materials' },
-      
-      // Exam Flow
-      { name: '16. Exam Config', category: 'Exam', color: '#ef4444', design: 'exam-config' },
-      { name: '17. Exam Running', category: 'Exam', color: '#ef4444', design: 'exam-running' },
-      { name: '18. Exam Results', category: 'Exam', color: '#ef4444', design: 'exam-results' },
-      { name: '19. Mistakes Review', category: 'Exam', color: '#ef4444', design: 'mistakes-review' },
-      { name: '20. Certificate', category: 'Exam', color: '#ef4444', design: 'certificate' },
-      
-      // Support Flow
-      { name: '21. AI Chat', category: 'Support', color: '#8b5cf6', design: 'ai-chat' },
-      { name: '22. Teacher Contact', category: 'Support', color: '#8b5cf6', design: 'teacher-contact' },
-      
-      // Profile Flow
-      { name: '23. Settings', category: 'Profile', color: '#06b6d4', design: 'settings' },
-      { name: '24. Profile Edit', category: 'Profile', color: '#06b6d4', design: 'profile-edit' },
-      { name: '25. Transactions', category: 'Profile', color: '#06b6d4', design: 'transactions' },
-      { name: '26. Notifications', category: 'Profile', color: '#06b6d4', design: 'notifications' },
-      
-      // Dark Mode Variants
-      { name: '27. Home (Dark)', category: 'Dark', color: '#1f2937', design: 'home-dark' },
-      { name: '28. Topics (Dark)', category: 'Dark', color: '#1f2937', design: 'topics-dark' },
-      { name: '29. Lesson (Dark)', category: 'Dark', color: '#1f2937', design: 'lesson-dark' },
-      { name: '30. Settings (Dark)', category: 'Dark', color: '#1f2937', design: 'settings-dark' }
-    ];
-
-    let x = 0;
-    let y = 0;
-    const spacing = 450;
-
-    for (let i = 0; i < screens.length; i++) {
-      const screen = screens[i];
-      
-      // Ekran frame-i yarat
-      const frame = figma.createFrame();
-      frame.name = screen.name;
-      frame.resize(375, 812); // iPhone ölçüsü
-      frame.x = x;
-      frame.y = y;
-      frame.fills = [{ type: 'SOLID', color: hexToRgb('#f9fafb') }]; // Ağ arxa plan
-      frame.cornerRadius = 20;
-
-      // Ekranın dizaynını yarat
-      await createScreenDesign(frame, screen, selectedFont);
-
-      // Grid düzümü
-      x += spacing;
-      if ((i + 1) % 6 === 0) {
-        x = 0;
-        y += 900;
-      }
-    }
-
-    figma.notify('✅ 30 detallı ekran yaradıldı!');
-    console.log('✅ Detallı ekranlar tamamlandı');
-    
-  } catch (error) {
-    console.error('❌ Ekran xətası:', error);
-    figma.notify('❌ Ekran xətası: ' + error.message, { error: true });
-  }
+  await loadFonts();
+  await createColorStyles();
+  await createTextStyles();
+  
+  figma.ui.postMessage({ type: 'progress', message: '✅ Stillər hazır!', progress: 100 });
+  figma.notify('✅ Design system stilləri yaradıldı!');
 }
 
-// Hər ekranın dizaynını yarat
-async function createScreenDesign(frame, screen, font) {
+// Yenidən yarat (təmizlə və yarat)
+async function regenerateAll() {
+  figma.ui.postMessage({ type: 'progress', message: '🗑️ Təmizlənir...', progress: 10 });
+  
+  // Mövcud səhifələri tap və sil
+  const existingPages = figma.root.children.filter(page => 
+    page.name.includes('DDA Mobile')
+  );
+  
+  for (const page of existingPages) {
+    page.remove();
+  }
+  
+  figma.ui.postMessage({ type: 'progress', message: '🚀 Yenidən yaradılır...', progress: 20 });
+  await createEverything();
+}
+
+// Bütün ekranları yarat
+async function createAllScreens() {
+  // Screens səhifəsi yarat
+  const screensPage = figma.createPage();
+  screensPage.name = '📱 DDA Mobile — All Screens';
+  figma.currentPage = screensPage;
+
+  const screens = [
+    // Auth & Onboarding (4)
+    { name: '01. Login', category: 'Auth', design: 'login' },
+    { name: '02. Onboarding 1', category: 'Auth', design: 'onboarding1' },
+    { name: '03. Onboarding 2', category: 'Auth', design: 'onboarding2' },
+    { name: '04. Onboarding 3', category: 'Auth', design: 'onboarding3' },
+    
+    // Main (4)
+    { name: '05. Home (No Package)', category: 'Main', design: 'home-no-package' },
+    { name: '06. Topics (Locked)', category: 'Main', design: 'topics-locked' },
+    { name: '07. Store', category: 'Main', design: 'store' },
+    { name: '08. More Menu', category: 'Main', design: 'more' },
+    
+    // Purchase (4)
+    { name: '09. Packages List', category: 'Purchase', design: 'packages' },
+    { name: '10. Package Details', category: 'Purchase', design: 'package-details' },
+    { name: '11. Payment Methods', category: 'Purchase', design: 'payment' },
+    { name: '12. Purchase Success', category: 'Purchase', design: 'success' },
+    
+    // Premium (2)
+    { name: '13. Home (Premium)', category: 'Premium', design: 'home-premium' },
+    { name: '14. Topics (Unlocked)', category: 'Premium', design: 'topics-unlocked' },
+    
+    // Learning (4)
+    { name: '15. Lesson View', category: 'Learning', design: 'lesson' },
+    { name: '16. Video Player', category: 'Learning', design: 'video' },
+    { name: '17. Practice Questions', category: 'Learning', design: 'practice' },
+    { name: '18. Teacher Contact', category: 'Learning', design: 'teacher' },
+    
+    // Exam (5)
+    { name: '19. Exam Config', category: 'Exam', design: 'exam-config' },
+    { name: '20. Exam Running', category: 'Exam', design: 'exam-running' },
+    { name: '21. Exam Results (Pass)', category: 'Exam', design: 'results-pass' },
+    { name: '22. Exam Results (Fail)', category: 'Exam', design: 'results-fail' },
+    { name: '23. Mistakes Review', category: 'Exam', design: 'mistakes' },
+    
+    // Support (3)
+    { name: '24. AI Chat', category: 'Support', design: 'ai-chat' },
+    { name: '25. Chat History', category: 'Support', design: 'chat-history' },
+    { name: '26. Notifications', category: 'Support', design: 'notifications' },
+    
+    // Profile (4)
+    { name: '27. Settings', category: 'Profile', design: 'settings' },
+    { name: '28. Profile Edit', category: 'Profile', design: 'profile-edit' },
+    { name: '29. Transactions', category: 'Profile', design: 'transactions' },
+    { name: '30. Balance Top-up', category: 'Profile', design: 'balance' }
+  ];
+
+  let x = 0;
+  let y = 0;
+  const spacing = 455; // 375 + 80px gap
+
+  for (let i = 0; i < screens.length; i++) {
+    const screen = screens[i];
+    
+    // Ekran frame-i yarat
+    const frame = figma.createFrame();
+    frame.name = screen.name;
+    frame.resize(375, 812);
+    frame.x = x;
+    frame.y = y;
+    frame.fills = [{ type: 'SOLID', color: hexToRgb('#f9fafb') }];
+    frame.cornerRadius = 20;
+    frame.layoutMode = 'VERTICAL';
+    frame.paddingTop = 0;
+    frame.paddingBottom = 0;
+    frame.paddingLeft = 0;
+    frame.paddingRight = 0;
+    frame.itemSpacing = 0;
+
+    // Ekranın dizaynını yarat
+    await createScreenDesign(frame, screen);
+
+    // Grid düzümü (4 sütun)
+    x += spacing;
+    if ((i + 1) % 4 === 0) {
+      x = 0;
+      y += 900;
+    }
+    
+    // Progress update
+    const progress = 40 + Math.floor((i / screens.length) * 40);
+    figma.ui.postMessage({ 
+      type: 'progress', 
+      message: `📱 ${screen.name} yaradıldı...`, 
+      progress 
+    });
+  }
+
+  console.log('✅ 30 əsas ekran yaradıldı');
+}
+
+// Dark variantları yarat
+async function createDarkVariants() {
+  const darkScreens = [
+    { name: '31. Home — Dark', design: 'home-premium', isDark: true },
+    { name: '32. Topics — Dark', design: 'topics-unlocked', isDark: true },
+    { name: '33. Lesson — Dark', design: 'lesson', isDark: true },
+    { name: '34. Settings — Dark', design: 'settings', isDark: true }
+  ];
+
+  let x = 0;
+  let y = 8100; // Aşağıda yerləşdir
+
+  for (let i = 0; i < darkScreens.length; i++) {
+    const screen = darkScreens[i];
+    
+    const frame = figma.createFrame();
+    frame.name = screen.name;
+    frame.resize(375, 812);
+    frame.x = x;
+    frame.y = y;
+    frame.fills = [{ type: 'SOLID', color: hexToRgb('#111827') }]; // Dark background
+    frame.cornerRadius = 20;
+    frame.layoutMode = 'VERTICAL';
+
+    await createScreenDesign(frame, screen);
+
+    x += 455;
+  }
+
+  console.log('✅ 4 dark variant yaradıldı');
+}
+
+// Ekran dizaynı yaradıcısı
+async function createScreenDesign(frame, screen) {
   try {
     switch (screen.design) {
       case 'login':
-        await createLoginScreen(frame, font);
+        await createLoginDesign(frame, screen.isDark);
+        break;
+      case 'onboarding1':
+        await createOnboardingDesign(frame, 1, screen.isDark);
+        break;
+      case 'onboarding2':
+        await createOnboardingDesign(frame, 2, screen.isDark);
+        break;
+      case 'onboarding3':
+        await createOnboardingDesign(frame, 3, screen.isDark);
         break;
       case 'home-no-package':
-        await createHomeNoPackageScreen(frame, font);
-        break;
-      case 'topics-locked':
-        await createTopicsLockedScreen(frame, font);
-        break;
-      case 'store':
-        await createStoreScreen(frame, font);
-        break;
-      case 'packages-list':
-        await createPackagesListScreen(frame, font);
+        await createHomeNoPackageDesign(frame, screen.isDark);
         break;
       case 'home-premium':
-        await createHomePremiumScreen(frame, font);
+        await createHomePremiumDesign(frame, screen.isDark);
         break;
-      case 'lesson-view':
-        await createLessonViewScreen(frame, font);
+      case 'topics-locked':
+        await createTopicsLockedDesign(frame, screen.isDark);
+        break;
+      case 'topics-unlocked':
+        await createTopicsUnlockedDesign(frame, screen.isDark);
+        break;
+      case 'store':
+        await createStoreDesign(frame, screen.isDark);
+        break;
+      case 'packages':
+        await createPackagesDesign(frame, screen.isDark);
+        break;
+      case 'lesson':
+        await createLessonDesign(frame, screen.isDark);
         break;
       case 'exam-config':
-        await createExamConfigScreen(frame, font);
+        await createExamConfigDesign(frame, screen.isDark);
         break;
       case 'exam-running':
-        await createExamRunningScreen(frame, font);
+        await createExamRunningDesign(frame, screen.isDark);
         break;
       case 'ai-chat':
-        await createAIChatScreen(frame, font);
+        await createAIChatDesign(frame, screen.isDark);
         break;
       case 'settings':
-        await createSettingsScreen(frame, font);
+        await createSettingsDesign(frame, screen.isDark);
         break;
       default:
-        await createDefaultScreen(frame, screen, font);
+        await createDefaultDesign(frame, screen);
         break;
     }
   } catch (error) {
     console.warn(`⚠️ ${screen.name} dizayn xətası:`, error);
-    await createDefaultScreen(frame, screen, font);
+    await createDefaultDesign(frame, screen);
   }
 }
 
 // Login ekranı dizaynı
-async function createLoginScreen(frame, font) {
-  // Arxa plan gradient
+async function createLoginDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f0fdf4';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  const textColor = isDark ? '#f9fafb' : '#111827';
+  const mutedColor = isDark ? '#9ca3af' : '#6b7280';
+  
   frame.fills = [{
     type: 'GRADIENT_LINEAR',
     gradientTransform: [[1, 0, 0], [0, 1, 0]],
     gradientStops: [
-      { position: 0, color: hexToRgb('#f0fdf4') },
-      { position: 1, color: hexToRgb('#dcfce7') }
+      { position: 0, color: hexToRgb(bgColor) },
+      { position: 1, color: hexToRgb(isDark ? '#1f2937' : '#dcfce7') }
     ]
   }];
+
+  // Logo container
+  const logoContainer = figma.createFrame();
+  logoContainer.resize(375, 200);
+  logoContainer.fills = [];
+  logoContainer.layoutMode = 'VERTICAL';
+  logoContainer.primaryAxisAlignItems = 'CENTER';
+  logoContainer.counterAxisAlignItems = 'CENTER';
+  logoContainer.itemSpacing = 16;
+  logoContainer.paddingTop = 60;
+  frame.appendChild(logoContainer);
 
   // Logo
   const logo = figma.createFrame();
   logo.resize(80, 80);
-  logo.x = 147.5; // Mərkəz
-  logo.y = 150;
   logo.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
   logo.cornerRadius = 20;
-  frame.appendChild(logo);
+  logoContainer.appendChild(logo);
 
-  // Logo text
   const logoText = figma.createText();
   logoText.characters = 'DDA';
   logoText.fontSize = 24;
-  logoText.fontName = font;
+  logoText.fontName = boldFont;
   logoText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  logoText.x = 20;
+  logoText.x = 28;
   logoText.y = 28;
   logo.appendChild(logoText);
 
-  // Başlıq
+  // Title
   const title = figma.createText();
   title.characters = 'DDA.az';
   title.fontSize = 32;
-  title.fontName = font;
-  title.fills = [{ type: 'SOLID', color: hexToRgb('#111827') }];
-  title.x = 137.5;
-  title.y = 250;
-  frame.appendChild(title);
+  title.fontName = boldFont;
+  title.fills = [{ type: 'SOLID', color: hexToRgb(textColor) }];
+  logoContainer.appendChild(title);
 
-  // Alt başlıq
+  // Subtitle
   const subtitle = figma.createText();
   subtitle.characters = 'Sürücülük vəsiqəsi üçün hazırlıq';
   subtitle.fontSize = 16;
-  subtitle.fontName = font;
-  subtitle.fills = [{ type: 'SOLID', color: hexToRgb('#6b7280') }];
-  subtitle.x = 87.5;
-  subtitle.y = 290;
-  frame.appendChild(subtitle);
+  subtitle.fontName = currentFont;
+  subtitle.fills = [{ type: 'SOLID', color: hexToRgb(mutedColor) }];
+  logoContainer.appendChild(subtitle);
+
+  // Form container
+  const formContainer = figma.createFrame();
+  formContainer.resize(335, 300);
+  formContainer.x = 20;
+  formContainer.y = 250;
+  formContainer.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+  formContainer.cornerRadius = 16;
+  formContainer.layoutMode = 'VERTICAL';
+  formContainer.itemSpacing = 16;
+  formContainer.paddingTop = 24;
+  formContainer.paddingBottom = 24;
+  formContainer.paddingLeft = 20;
+  formContainer.paddingRight = 20;
+  frame.appendChild(formContainer);
 
   // Email input
-  const emailInput = figma.createFrame();
-  emailInput.resize(335, 48);
-  emailInput.x = 20;
-  emailInput.y = 350;
-  emailInput.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  emailInput.cornerRadius = 12;
-  emailInput.strokes = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
-  emailInput.strokeWeight = 1;
-  frame.appendChild(emailInput);
-
-  const emailText = figma.createText();
-  emailText.characters = 'E-mail ünvanınızı daxil edin';
-  emailText.fontSize = 14;
-  emailText.fontName = font;
-  emailText.fills = [{ type: 'SOLID', color: hexToRgb('#9ca3af') }];
-  emailText.x = 16;
-  emailText.y = 17;
-  emailInput.appendChild(emailText);
+  const emailInput = createInput('E-mail ünvanınızı daxil edin', isDark);
+  formContainer.appendChild(emailInput);
 
   // Password input
-  const passwordInput = figma.createFrame();
-  passwordInput.resize(335, 48);
-  passwordInput.x = 20;
-  passwordInput.y = 410;
-  passwordInput.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  passwordInput.cornerRadius = 12;
-  passwordInput.strokes = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
-  passwordInput.strokeWeight = 1;
-  frame.appendChild(passwordInput);
-
-  const passwordText = figma.createText();
-  passwordText.characters = 'Şifrənizi daxil edin';
-  passwordText.fontSize = 14;
-  passwordText.fontName = font;
-  passwordText.fills = [{ type: 'SOLID', color: hexToRgb('#9ca3af') }];
-  passwordText.x = 16;
-  passwordText.y = 17;
-  passwordInput.appendChild(passwordText);
+  const passwordInput = createInput('Şifrənizi daxil edin', isDark);
+  formContainer.appendChild(passwordInput);
 
   // Login button
-  const loginButton = figma.createFrame();
-  loginButton.resize(335, 48);
-  loginButton.x = 20;
-  loginButton.y = 480;
-  loginButton.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
-  loginButton.cornerRadius = 12;
-  frame.appendChild(loginButton);
+  const loginButton = createButton('Daxil ol', 'primary', isDark);
+  formContainer.appendChild(loginButton);
 
-  const loginButtonText = figma.createText();
-  loginButtonText.characters = 'Daxil ol';
-  loginButtonText.fontSize = 16;
-  loginButtonText.fontName = font;
-  loginButtonText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  loginButtonText.x = 147.5;
-  loginButtonText.y = 16;
-  loginButton.appendChild(loginButtonText);
-
-  // Social buttons
-  const googleButton = figma.createFrame();
-  googleButton.resize(335, 48);
-  googleButton.x = 20;
-  googleButton.y = 550;
-  googleButton.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  googleButton.cornerRadius = 12;
-  googleButton.strokes = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
-  googleButton.strokeWeight = 1;
-  frame.appendChild(googleButton);
-
-  const googleButtonText = figma.createText();
-  googleButtonText.characters = 'Google ilə daxil ol';
-  googleButtonText.fontSize = 14;
-  googleButtonText.fontName = font;
-  googleButtonText.fills = [{ type: 'SOLID', color: hexToRgb('#374151') }];
-  googleButtonText.x = 127.5;
-  googleButtonText.y = 17;
-  googleButton.appendChild(googleButtonText);
+  // Social button
+  const socialButton = createButton('Google ilə daxil ol', 'secondary', isDark);
+  formContainer.appendChild(socialButton);
 }
 
-// Home (No Package) ekranı dizaynı
-async function createHomeNoPackageScreen(frame, font) {
+// Home (No Package) dizaynı
+async function createHomeNoPackageDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  const textColor = isDark ? '#f9fafb' : '#111827';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
   // Header
-  const header = figma.createFrame();
-  header.resize(375, 60);
-  header.x = 0;
-  header.y = 0;
-  header.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  const header = createHeader('Salam, Tural 👋', isDark);
   frame.appendChild(header);
 
-  // Header title
-  const headerTitle = figma.createText();
-  headerTitle.characters = 'Salam, Tural Qarayev 👋';
-  headerTitle.fontSize = 16;
-  headerTitle.fontName = font;
-  headerTitle.fills = [{ type: 'SOLID', color: hexToRgb('#111827') }];
-  headerTitle.x = 20;
-  headerTitle.y = 22;
-  header.appendChild(headerTitle);
-
-  // No package warning
+  // Warning card
   const warningCard = figma.createFrame();
   warningCard.resize(335, 60);
   warningCard.x = 20;
@@ -554,35 +524,18 @@ async function createHomeNoPackageScreen(frame, font) {
   const warningText = figma.createText();
   warningText.characters = '📦 Aktiv paketiniz yoxdur';
   warningText.fontSize = 14;
-  warningText.fontName = font;
+  warningText.fontName = currentFont;
   warningText.fills = [{ type: 'SOLID', color: hexToRgb('#1e40af') }];
   warningText.x = 16;
-  warningText.y = 12;
+  warningText.y = 23;
   warningCard.appendChild(warningText);
-
-  const packageButton = figma.createFrame();
-  packageButton.resize(80, 28);
-  packageButton.x = 240;
-  packageButton.y = 16;
-  packageButton.fills = [{ type: 'SOLID', color: hexToRgb('#2563eb') }];
-  packageButton.cornerRadius = 6;
-  warningCard.appendChild(packageButton);
-
-  const packageButtonText = figma.createText();
-  packageButtonText.characters = 'Paket al';
-  packageButtonText.fontSize = 12;
-  packageButtonText.fontName = font;
-  packageButtonText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  packageButtonText.x = 20;
-  packageButtonText.y = 8;
-  packageButton.appendChild(packageButtonText);
 
   // Progress card
   const progressCard = figma.createFrame();
   progressCard.resize(335, 80);
   progressCard.x = 20;
   progressCard.y = 160;
-  progressCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  progressCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
   progressCard.cornerRadius = 12;
   progressCard.effects = [{
     type: 'DROP_SHADOW',
@@ -596,8 +549,8 @@ async function createHomeNoPackageScreen(frame, font) {
   const progressText = figma.createText();
   progressText.characters = 'İrəliləyiş: 42%';
   progressText.fontSize = 14;
-  progressText.fontName = font;
-  progressText.fills = [{ type: 'SOLID', color: hexToRgb('#6b7280') }];
+  progressText.fontName = currentFont;
+  progressText.fills = [{ type: 'SOLID', color: hexToRgb(textColor) }];
   progressText.x = 16;
   progressText.y = 16;
   progressCard.appendChild(progressText);
@@ -631,463 +584,27 @@ async function createHomeNoPackageScreen(frame, font) {
   for (let i = 0; i < actions.length; i += 2) {
     for (let j = 0; j < 2 && i + j < actions.length; j++) {
       const action = actions[i + j];
-      const actionCard = figma.createFrame();
-      actionCard.resize(160, 80);
-      actionCard.x = 20 + j * 175;
-      actionCard.y = actionY;
-      actionCard.fills = [{ type: 'SOLID', color: action.locked ? hexToRgb('#f3f4f6') : { r: 1, g: 1, b: 1 } }];
-      actionCard.cornerRadius = 12;
-      actionCard.effects = [{
-        type: 'DROP_SHADOW',
-        color: { r: 0, g: 0, b: 0, a: 0.1 },
-        offset: { x: 0, y: 2 },
-        radius: 4,
-        visible: true
-      }];
+      const actionCard = createActionCard(action, 20 + j * 175, actionY, isDark);
       frame.appendChild(actionCard);
-
-      const actionText = figma.createText();
-      actionText.characters = action.title;
-      actionText.fontSize = 12;
-      actionText.fontName = font;
-      actionText.fills = [{ type: 'SOLID', color: action.locked ? hexToRgb('#9ca3af') : hexToRgb('#374151') }];
-      actionText.x = 16;
-      actionText.y = 34;
-      actionCard.appendChild(actionText);
-
-      if (action.locked) {
-        const lockIcon = figma.createText();
-        lockIcon.characters = '🔒';
-        lockIcon.fontSize = 16;
-        lockIcon.fontName = font;
-        lockIcon.x = 120;
-        lockIcon.y = 16;
-        actionCard.appendChild(lockIcon);
-      }
     }
     actionY += 100;
   }
 
   // Tab bar
-  const tabBar = figma.createFrame();
-  tabBar.resize(375, 80);
-  tabBar.x = 0;
-  tabBar.y = 732;
-  tabBar.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  tabBar.strokes = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
-  tabBar.strokeWeight = 1;
+  const tabBar = createTabBar(0, isDark);
   frame.appendChild(tabBar);
-
-  const tabs = ['🏠 Ana', '📚 Təlimlər', '🧪 İmtahan', '🛍️ Mağaza', '➕ Daha'];
-  for (let i = 0; i < tabs.length; i++) {
-    const tab = figma.createText();
-    tab.characters = tabs[i];
-    tab.fontSize = 10;
-    tab.fontName = font;
-    tab.fills = [{ type: 'SOLID', color: i === 0 ? hexToRgb('#22c55e') : hexToRgb('#6b7280') }];
-    tab.x = 15 + i * 75;
-    tab.y = 25;
-    tabBar.appendChild(tab);
-  }
 }
 
-// Topics (Locked) ekranı dizaynı
-async function createTopicsLockedScreen(frame, font) {
-  // Header
-  const header = figma.createFrame();
-  header.resize(375, 60);
-  header.x = 0;
-  header.y = 0;
-  header.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+// Packages dizaynı
+async function createPackagesDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+
+  // Header with back button
+  const header = createHeaderWithBack('Təlim Paketləri', isDark);
   frame.appendChild(header);
-
-  const headerTitle = figma.createText();
-  headerTitle.characters = 'Təlim Mövzuları';
-  headerTitle.fontSize = 18;
-  headerTitle.fontName = font;
-  headerTitle.fills = [{ type: 'SOLID', color: hexToRgb('#111827') }];
-  headerTitle.x = 20;
-  headerTitle.y = 21;
-  header.appendChild(headerTitle);
-
-  // Package warning
-  const warningCard = figma.createFrame();
-  warningCard.resize(335, 60);
-  warningCard.x = 20;
-  warningCard.y = 80;
-  warningCard.fills = [{ type: 'SOLID', color: hexToRgb('#dbeafe') }];
-  warningCard.cornerRadius = 12;
-  frame.appendChild(warningCard);
-
-  const warningText = figma.createText();
-  warningText.characters = 'Paket alın və bütün təlimləri açın';
-  warningText.fontSize = 14;
-  warningText.fontName = font;
-  warningText.fills = [{ type: 'SOLID', color: hexToRgb('#1e40af') }];
-  warningText.x = 16;
-  warningText.y = 23;
-  warningCard.appendChild(warningText);
-
-  // Search bar
-  const searchBar = figma.createFrame();
-  searchBar.resize(335, 44);
-  searchBar.x = 20;
-  searchBar.y = 160;
-  searchBar.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  searchBar.cornerRadius = 12;
-  searchBar.strokes = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
-  searchBar.strokeWeight = 1;
-  frame.appendChild(searchBar);
-
-  const searchText = figma.createText();
-  searchText.characters = '🔍 Mövzu axtarın...';
-  searchText.fontSize = 14;
-  searchText.fontName = font;
-  searchText.fills = [{ type: 'SOLID', color: hexToRgb('#9ca3af') }];
-  searchText.x = 16;
-  searchText.y = 15;
-  searchBar.appendChild(searchText);
-
-  // Module list
-  const modules = [
-    { title: 'M1: Yol hərəkəti qaydaları', progress: 0, locked: true },
-    { title: 'M2: Yol nişanları', progress: 0, locked: true },
-    { title: 'M3: Dairəvi hərəkət', progress: 0, locked: true },
-    { title: 'M8: Pulsuz modul', progress: 25, locked: false },
-    { title: 'M11: Demo modul', progress: 10, locked: false }
-  ];
-
-  let moduleY = 220;
-  for (const module of modules) {
-    const moduleCard = figma.createFrame();
-    moduleCard.resize(335, 80);
-    moduleCard.x = 20;
-    moduleCard.y = moduleY;
-    moduleCard.fills = [{ type: 'SOLID', color: module.locked ? hexToRgb('#f9fafb') : { r: 1, g: 1, b: 1 } }];
-    moduleCard.cornerRadius = 12;
-    moduleCard.effects = [{
-      type: 'DROP_SHADOW',
-      color: { r: 0, g: 0, b: 0, a: 0.1 },
-      offset: { x: 0, y: 2 },
-      radius: 4,
-      visible: true
-    }];
-    frame.appendChild(moduleCard);
-
-    if (module.locked) {
-      const lockIcon = figma.createText();
-      lockIcon.characters = '🔒';
-      lockIcon.fontSize = 16;
-      lockIcon.fontName = font;
-      lockIcon.x = 16;
-      lockIcon.y = 16;
-      moduleCard.appendChild(lockIcon);
-    }
-
-    const moduleTitle = figma.createText();
-    moduleTitle.characters = module.title;
-    moduleTitle.fontSize = 14;
-    moduleTitle.fontName = font;
-    moduleTitle.fills = [{ type: 'SOLID', color: module.locked ? hexToRgb('#9ca3af') : hexToRgb('#111827') }];
-    moduleTitle.x = module.locked ? 45 : 16;
-    moduleTitle.y = 16;
-    moduleCard.appendChild(moduleTitle);
-
-    const progressText = figma.createText();
-    progressText.characters = `İrəliləyiş: ${module.progress}%`;
-    progressText.fontSize = 12;
-    progressText.fontName = font;
-    progressText.fills = [{ type: 'SOLID', color: hexToRgb('#6b7280') }];
-    progressText.x = module.locked ? 45 : 16;
-    progressText.y = 36;
-    moduleCard.appendChild(progressText);
-
-    // Progress bar
-    const progressBar = figma.createFrame();
-    progressBar.resize(303, 6);
-    progressBar.x = 16;
-    progressBar.y = 58;
-    progressBar.fills = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
-    progressBar.cornerRadius = 3;
-    moduleCard.appendChild(progressBar);
-
-    if (module.progress > 0) {
-      const progressFill = figma.createFrame();
-      progressFill.resize(303 * module.progress / 100, 6);
-      progressFill.x = 0;
-      progressFill.y = 0;
-      progressFill.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
-      progressFill.cornerRadius = 3;
-      progressBar.appendChild(progressFill);
-    }
-
-    const actionButton = figma.createFrame();
-    actionButton.resize(80, 28);
-    actionButton.x = 235;
-    actionButton.y = 26;
-    actionButton.fills = [{ type: 'SOLID', color: module.locked ? hexToRgb('#e5e7eb') : hexToRgb('#22c55e') }];
-    actionButton.cornerRadius = 6;
-    moduleCard.appendChild(actionButton);
-
-    const actionButtonText = figma.createText();
-    actionButtonText.characters = module.locked ? 'Kilidli' : 'Başla';
-    actionButtonText.fontSize = 12;
-    actionButtonText.fontName = font;
-    actionButtonText.fills = [{ type: 'SOLID', color: module.locked ? hexToRgb('#9ca3af') : { r: 1, g: 1, b: 1 } }];
-    actionButtonText.x = module.locked ? 22 : 28;
-    actionButtonText.y = 8;
-    actionButton.appendChild(actionButtonText);
-
-    moduleY += 100;
-  }
-
-  // Tab bar
-  const tabBar = figma.createFrame();
-  tabBar.resize(375, 80);
-  tabBar.x = 0;
-  tabBar.y = 732;
-  tabBar.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  tabBar.strokes = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
-  tabBar.strokeWeight = 1;
-  frame.appendChild(tabBar);
-
-  const tabs = ['🏠 Ana', '📚 Təlimlər', '🧪 İmtahan', '🛍️ Mağaza', '➕ Daha'];
-  for (let i = 0; i < tabs.length; i++) {
-    const tab = figma.createText();
-    tab.characters = tabs[i];
-    tab.fontSize = 10;
-    tab.fontName = font;
-    tab.fills = [{ type: 'SOLID', color: i === 1 ? hexToRgb('#22c55e') : hexToRgb('#6b7280') }];
-    tab.x = 15 + i * 75;
-    tab.y = 25;
-    tabBar.appendChild(tab);
-  }
-}
-
-// Store ekranı dizaynı
-async function createStoreScreen(frame, font) {
-  // Header
-  const header = figma.createFrame();
-  header.resize(375, 60);
-  header.x = 0;
-  header.y = 0;
-  header.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  frame.appendChild(header);
-
-  const headerTitle = figma.createText();
-  headerTitle.characters = 'Mağaza';
-  headerTitle.fontSize = 18;
-  headerTitle.fontName = font;
-  headerTitle.fills = [{ type: 'SOLID', color: hexToRgb('#111827') }];
-  headerTitle.x = 20;
-  headerTitle.y = 21;
-  header.appendChild(headerTitle);
-
-  // Store intro
-  const introCard = figma.createFrame();
-  introCard.resize(335, 60);
-  introCard.x = 20;
-  introCard.y = 80;
-  introCard.fills = [{ type: 'SOLID', color: hexToRgb('#f0fdf4') }];
-  introCard.cornerRadius = 12;
-  frame.appendChild(introCard);
-
-  const introTitle = figma.createText();
-  introTitle.characters = 'Sürücülük kitabları və materialları';
-  introTitle.fontSize = 14;
-  introTitle.fontName = font;
-  introTitle.fills = [{ type: 'SOLID', color: hexToRgb('#166534') }];
-  introTitle.x = 16;
-  introTitle.y = 23;
-  introCard.appendChild(introTitle);
-
-  // Books grid
-  const books = [
-    { title: 'Yol Hərəkəti Qaydaları', price: '12 AZN' },
-    { title: 'Yol Nişanları Atlası', price: '8 AZN' },
-    { title: 'Sürücülük Təcrübəsi', price: '15 AZN' },
-    { title: 'İmtahan Hazırlığı', price: '10 AZN' }
-  ];
-
-  let bookY = 160;
-  for (let i = 0; i < books.length; i += 2) {
-    for (let j = 0; j < 2 && i + j < books.length; j++) {
-      const book = books[i + j];
-      const bookCard = figma.createFrame();
-      bookCard.resize(160, 200);
-      bookCard.x = 20 + j * 175;
-      bookCard.y = bookY;
-      bookCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-      bookCard.cornerRadius = 12;
-      bookCard.effects = [{
-        type: 'DROP_SHADOW',
-        color: { r: 0, g: 0, b: 0, a: 0.1 },
-        offset: { x: 0, y: 2 },
-        radius: 4,
-        visible: true
-      }];
-      frame.appendChild(bookCard);
-
-      // Book image placeholder
-      const bookImage = figma.createFrame();
-      bookImage.resize(128, 96);
-      bookImage.x = 16;
-      bookImage.y = 16;
-      bookImage.fills = [{ type: 'SOLID', color: hexToRgb('#f3f4f6') }];
-      bookImage.cornerRadius = 8;
-      bookCard.appendChild(bookImage);
-
-      const bookIcon = figma.createText();
-      bookIcon.characters = '📚';
-      bookIcon.fontSize = 32;
-      bookIcon.fontName = font;
-      bookIcon.x = 48;
-      bookIcon.y = 32;
-      bookImage.appendChild(bookIcon);
-
-      const bookTitle = figma.createText();
-      bookTitle.characters = book.title;
-      bookTitle.fontSize = 12;
-      bookTitle.fontName = font;
-      bookTitle.fills = [{ type: 'SOLID', color: hexToRgb('#111827') }];
-      bookTitle.x = 16;
-      bookTitle.y = 128;
-      bookCard.appendChild(bookTitle);
-
-      const bookPrice = figma.createText();
-      bookPrice.characters = book.price;
-      bookPrice.fontSize = 14;
-      bookPrice.fontName = font;
-      bookPrice.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
-      bookPrice.x = 16;
-      bookPrice.y = 148;
-      bookCard.appendChild(bookPrice);
-
-      const buyButton = figma.createFrame();
-      buyButton.resize(128, 28);
-      buyButton.x = 16;
-      buyButton.y = 172;
-      buyButton.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
-      buyButton.cornerRadius = 6;
-      bookCard.appendChild(buyButton);
-
-      const buyButtonText = figma.createText();
-      buyButtonText.characters = 'Səbətə at';
-      buyButtonText.fontSize = 12;
-      buyButtonText.fontName = font;
-      buyButtonText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-      buyButtonText.x = 38;
-      buyButtonText.y = 8;
-      buyButton.appendChild(buyButtonText);
-    }
-    bookY += 220;
-  }
-
-  // Payment methods
-  const paymentCard = figma.createFrame();
-  paymentCard.resize(335, 100);
-  paymentCard.x = 20;
-  paymentCard.y = 600;
-  paymentCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  paymentCard.cornerRadius = 12;
-  paymentCard.effects = [{
-    type: 'DROP_SHADOW',
-    color: { r: 0, g: 0, b: 0, a: 0.1 },
-    offset: { x: 0, y: 2 },
-    radius: 4,
-    visible: true
-  }];
-  frame.appendChild(paymentCard);
-
-  const paymentTitle = figma.createText();
-  paymentTitle.characters = 'Ödəniş üsulları';
-  paymentTitle.fontSize = 14;
-  paymentTitle.fontName = font;
-  paymentTitle.fills = [{ type: 'SOLID', color: hexToRgb('#111827') }];
-  paymentTitle.x = 16;
-  paymentTitle.y = 16;
-  paymentCard.appendChild(paymentTitle);
-
-  const paymentMethods = ['💳 Kart', '📱 Mobil', '🏦 Bank'];
-  for (let i = 0; i < paymentMethods.length; i++) {
-    const methodCard = figma.createFrame();
-    methodCard.resize(95, 40);
-    methodCard.x = 16 + i * 105;
-    methodCard.y = 44;
-    methodCard.fills = [{ type: 'SOLID', color: hexToRgb('#f9fafb') }];
-    methodCard.cornerRadius = 8;
-    methodCard.strokes = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
-    methodCard.strokeWeight = 1;
-    paymentCard.appendChild(methodCard);
-
-    const methodText = figma.createText();
-    methodText.characters = paymentMethods[i];
-    methodText.fontSize = 12;
-    methodText.fontName = font;
-    methodText.fills = [{ type: 'SOLID', color: hexToRgb('#6b7280') }];
-    methodText.x = 25;
-    methodText.y = 14;
-    methodCard.appendChild(methodText);
-  }
-
-  // Tab bar
-  const tabBar = figma.createFrame();
-  tabBar.resize(375, 80);
-  tabBar.x = 0;
-  tabBar.y = 732;
-  tabBar.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  tabBar.strokes = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
-  tabBar.strokeWeight = 1;
-  frame.appendChild(tabBar);
-
-  const tabs = ['🏠 Ana', '📚 Təlimlər', '🧪 İmtahan', '🛍️ Mağaza', '➕ Daha'];
-  for (let i = 0; i < tabs.length; i++) {
-    const tab = figma.createText();
-    tab.characters = tabs[i];
-    tab.fontSize = 10;
-    tab.fontName = font;
-    tab.fills = [{ type: 'SOLID', color: i === 3 ? hexToRgb('#22c55e') : hexToRgb('#6b7280') }];
-    tab.x = 15 + i * 75;
-    tab.y = 25;
-    tabBar.appendChild(tab);
-  }
-}
-
-// Packages List ekranı dizaynı
-async function createPackagesListScreen(frame, font) {
-  // Header
-  const header = figma.createFrame();
-  header.resize(375, 60);
-  header.x = 0;
-  header.y = 0;
-  header.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  frame.appendChild(header);
-
-  const backButton = figma.createFrame();
-  backButton.resize(36, 36);
-  backButton.x = 20;
-  backButton.y = 12;
-  backButton.fills = [{ type: 'SOLID', color: hexToRgb('#f3f4f6') }];
-  backButton.cornerRadius = 8;
-  header.appendChild(backButton);
-
-  const backIcon = figma.createText();
-  backIcon.characters = '←';
-  backIcon.fontSize = 16;
-  backIcon.fontName = font;
-  backIcon.fills = [{ type: 'SOLID', color: hexToRgb('#374151') }];
-  backIcon.x = 10;
-  backIcon.y = 10;
-  backButton.appendChild(backIcon);
-
-  const headerTitle = figma.createText();
-  headerTitle.characters = 'Təlim Paketləri';
-  headerTitle.fontSize = 18;
-  headerTitle.fontName = font;
-  headerTitle.fills = [{ type: 'SOLID', color: hexToRgb('#111827') }];
-  headerTitle.x = 70;
-  headerTitle.y = 21;
-  header.appendChild(headerTitle);
 
   // Balance info
   const balanceCard = figma.createFrame();
@@ -1101,7 +618,7 @@ async function createPackagesListScreen(frame, font) {
   const balanceText = figma.createText();
   balanceText.characters = 'Balans: 100 AZN';
   balanceText.fontSize = 16;
-  balanceText.fontName = font;
+  balanceText.fontName = boldFont;
   balanceText.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
   balanceText.x = 16;
   balanceText.y = 22;
@@ -1109,18 +626,18 @@ async function createPackagesListScreen(frame, font) {
 
   // Package cards
   const packages = [
-    { name: 'Sadə Paket', price: '15 AZN', popular: false, color: '#6b7280' },
-    { name: 'Standart Paket', price: '25 AZN', popular: true, color: '#22c55e' },
-    { name: 'Premium Paket', price: '40 AZN', popular: false, color: '#3b82f6' }
+    { name: 'Sadə Paket', price: '15 AZN', popular: false },
+    { name: 'Standart Paket', price: '25 AZN', popular: true },
+    { name: 'Premium Paket', price: '40 AZN', popular: false }
   ];
 
   let packageY = 160;
   for (const pkg of packages) {
     const packageCard = figma.createFrame();
-    packageCard.resize(335, 200);
+    packageCard.resize(335, 180);
     packageCard.x = 20;
     packageCard.y = packageY;
-    packageCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    packageCard.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
     packageCard.cornerRadius = 16;
     packageCard.effects = [{
       type: 'DROP_SHADOW',
@@ -1129,43 +646,39 @@ async function createPackagesListScreen(frame, font) {
       radius: 8,
       visible: true
     }];
+    
     if (pkg.popular) {
       packageCard.strokes = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
       packageCard.strokeWeight = 2;
     }
     frame.appendChild(packageCard);
 
+    // Popular badge
     if (pkg.popular) {
-      const popularBadge = figma.createFrame();
-      popularBadge.resize(120, 24);
-      popularBadge.x = 107.5;
-      popularBadge.y = -12;
-      popularBadge.fills = [{
-        type: 'GRADIENT_LINEAR',
-        gradientTransform: [[1, 0, 0], [0, 1, 0]],
-        gradientStops: [
-          { position: 0, color: hexToRgb('#22c55e') },
-          { position: 1, color: hexToRgb('#16a34a') }
-        ]
-      }];
-      popularBadge.cornerRadius = 12;
-      packageCard.appendChild(popularBadge);
+      const badge = figma.createFrame();
+      badge.resize(120, 24);
+      badge.x = 107.5;
+      badge.y = -12;
+      badge.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+      badge.cornerRadius = 12;
+      packageCard.appendChild(badge);
 
-      const popularText = figma.createText();
-      popularText.characters = '⭐ Ən Populyar';
-      popularText.fontSize = 12;
-      popularText.fontName = font;
-      popularText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-      popularText.x = 20;
-      popularText.y = 6;
-      popularBadge.appendChild(popularText);
+      const badgeText = figma.createText();
+      badgeText.characters = '⭐ Ən Populyar';
+      badgeText.fontSize = 12;
+      badgeText.fontName = boldFont;
+      badgeText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+      badgeText.x = 20;
+      badgeText.y = 6;
+      badge.appendChild(badgeText);
     }
 
+    // Package content
     const packageName = figma.createText();
     packageName.characters = pkg.name;
     packageName.fontSize = 20;
-    packageName.fontName = font;
-    packageName.fills = [{ type: 'SOLID', color: hexToRgb(pkg.color) }];
+    packageName.fontName = boldFont;
+    packageName.fills = [{ type: 'SOLID', color: hexToRgb(pkg.popular ? '#22c55e' : (isDark ? '#f9fafb' : '#111827')) }];
     packageName.x = 16;
     packageName.y = 20;
     packageCard.appendChild(packageName);
@@ -1173,135 +686,468 @@ async function createPackagesListScreen(frame, font) {
     const packagePrice = figma.createText();
     packagePrice.characters = pkg.price;
     packagePrice.fontSize = 28;
-    packagePrice.fontName = font;
-    packagePrice.fills = [{ type: 'SOLID', color: hexToRgb(pkg.color) }];
+    packagePrice.fontName = boldFont;
+    packagePrice.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
     packagePrice.x = 16;
     packagePrice.y = 50;
     packageCard.appendChild(packagePrice);
 
-    const packageDuration = figma.createText();
-    packageDuration.characters = '30 gün müddətinə';
-    packageDuration.fontSize = 12;
-    packageDuration.fontName = font;
-    packageDuration.fills = [{ type: 'SOLID', color: hexToRgb('#6b7280') }];
-    packageDuration.x = 16;
-    packageDuration.y = 85;
-    packageCard.appendChild(packageDuration);
-
     // Features
-    const features = [
-      '✓ 3D video dərslər',
-      '✓ Dərs materialları',
-      '✓ İmtahan simulyatoru',
-      '✓ Müəllimlə əlaqə'
-    ];
-
-    let featureY = 110;
+    const features = ['✓ 3D video dərslər', '✓ Dərs materialları', '✓ İmtahan simulyatoru'];
+    let featureY = 90;
     for (const feature of features) {
       const featureText = figma.createText();
       featureText.characters = feature;
       featureText.fontSize = 12;
-      featureText.fontName = font;
-      featureText.fills = [{ type: 'SOLID', color: hexToRgb('#374151') }];
+      featureText.fontName = currentFont;
+      featureText.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#d1d5db' : '#374151') }];
       featureText.x = 16;
       featureText.y = featureY;
       packageCard.appendChild(featureText);
       featureY += 18;
     }
 
-    const buyButton = figma.createFrame();
+    // Buy button
+    const buyButton = createButton(`Paketi Al - ${pkg.price}`, 'primary', isDark);
     buyButton.resize(303, 36);
     buyButton.x = 16;
-    buyButton.y = 180;
-    buyButton.fills = [{ type: 'SOLID', color: hexToRgb(pkg.color) }];
-    buyButton.cornerRadius = 8;
+    buyButton.y = 140;
     packageCard.appendChild(buyButton);
 
-    const buyButtonText = figma.createText();
-    buyButtonText.characters = `Paketi Al - ${pkg.price}`;
-    buyButtonText.fontSize = 14;
-    buyButtonText.fontName = font;
-    buyButtonText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-    buyButtonText.x = 100;
-    buyButtonText.y = 11;
-    buyButton.appendChild(buyButtonText);
-
-    packageY += 220;
+    packageY += 200;
   }
 }
 
-// Default ekran dizaynı
-async function createDefaultScreen(frame, screen, font) {
-  // Arxa plan
-  frame.fills = [{ type: 'SOLID', color: hexToRgb(screen.color) }];
+// AI Chat dizaynı
+async function createAIChatDesign(frame, isDark = false) {
+  const bgColor = isDark ? '#111827' : '#f9fafb';
+  const surfaceColor = isDark ? '#1f2937' : '#ffffff';
+  const textColor = isDark ? '#f9fafb' : '#111827';
+  
+  frame.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
 
-  // Başlıq
+  // Header
+  const header = createChatHeader(isDark);
+  frame.appendChild(header);
+
+  // Messages area
+  const messagesArea = figma.createFrame();
+  messagesArea.resize(375, 600);
+  messagesArea.x = 0;
+  messagesArea.y = 80;
+  messagesArea.fills = [];
+  frame.appendChild(messagesArea);
+
+  // AI message
+  const aiMessage = figma.createFrame();
+  aiMessage.resize(280, 60);
+  aiMessage.x = 20;
+  aiMessage.y = 20;
+  aiMessage.fills = [{ type: 'SOLID', color: hexToRgb('#f3f4f6') }];
+  aiMessage.cornerRadius = 16;
+  messagesArea.appendChild(aiMessage);
+
+  const aiText = figma.createText();
+  aiText.characters = 'Salam! Sürücülük qaydaları ilə bağlı suallarınızı verə bilərsiniz.';
+  aiText.fontSize = 14;
+  aiText.fontName = currentFont;
+  aiText.fills = [{ type: 'SOLID', color: hexToRgb('#374151') }];
+  aiText.x = 16;
+  aiText.y = 16;
+  aiText.resize(248, 28);
+  aiMessage.appendChild(aiText);
+
+  // User message
+  const userMessage = figma.createFrame();
+  userMessage.resize(250, 40);
+  userMessage.x = 105;
+  userMessage.y = 100;
+  userMessage.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+  userMessage.cornerRadius = 16;
+  messagesArea.appendChild(userMessage);
+
+  const userText = figma.createText();
+  userText.characters = 'Yol nişanlarının növləri hansılardır?';
+  userText.fontSize = 14;
+  userText.fontName = currentFont;
+  userText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  userText.x = 16;
+  userText.y = 13;
+  userMessage.appendChild(userText);
+
+  // Input area
+  const inputArea = figma.createFrame();
+  inputArea.resize(375, 80);
+  inputArea.x = 0;
+  inputArea.y = 732;
+  inputArea.fills = [{ type: 'SOLID', color: hexToRgb(surfaceColor) }];
+  inputArea.strokes = [{ type: 'SOLID', color: hexToRgb('#e5e7eb') }];
+  inputArea.strokeWeight = 1;
+  frame.appendChild(inputArea);
+
+  const input = createInput('Sualınızı yazın...', isDark);
+  input.resize(250, 44);
+  input.x = 16;
+  input.y = 18;
+  inputArea.appendChild(input);
+
+  const sendButton = createButton('Göndər', 'primary', isDark);
+  sendButton.resize(80, 44);
+  sendButton.x = 279;
+  sendButton.y = 18;
+  inputArea.appendChild(sendButton);
+}
+
+// Flow Map yaradıcısı
+async function createFlowMap() {
+  figma.ui.postMessage({ type: 'progress', message: '🗺️ Flow Map yaradılır...', progress: 20 });
+  
+  const flowPage = figma.createPage();
+  flowPage.name = '🗺️ DDA Mobile — Flow Map';
+  figma.currentPage = flowPage;
+
+  const flows = [
+    // Auth Flow
+    { name: 'Login', x: 100, y: 100, connects: ['Onboarding 1'] },
+    { name: 'Onboarding 1', x: 300, y: 100, connects: ['Onboarding 2'] },
+    { name: 'Onboarding 2', x: 500, y: 100, connects: ['Onboarding 3'] },
+    { name: 'Onboarding 3', x: 700, y: 100, connects: ['Home (No Package)'] },
+    
+    // Main Flow
+    { name: 'Home (No Package)', x: 100, y: 300, connects: ['Topics (Locked)', 'Store', 'More'] },
+    { name: 'Topics (Locked)', x: 300, y: 300, connects: ['Packages List'] },
+    { name: 'Store', x: 500, y: 300, connects: [] },
+    { name: 'More', x: 700, y: 300, connects: ['Settings'] },
+    
+    // Purchase Flow
+    { name: 'Packages List', x: 100, y: 500, connects: ['Package Details'] },
+    { name: 'Package Details', x: 300, y: 500, connects: ['Payment'] },
+    { name: 'Payment', x: 500, y: 500, connects: ['Purchase Success'] },
+    { name: 'Purchase Success', x: 700, y: 500, connects: ['Home (Premium)'] },
+    
+    // Premium Flow
+    { name: 'Home (Premium)', x: 100, y: 700, connects: ['Topics (Unlocked)', 'Lesson View'] },
+    { name: 'Topics (Unlocked)', x: 300, y: 700, connects: ['Lesson View'] },
+    { name: 'Lesson View', x: 500, y: 700, connects: ['Practice', 'Exam Config'] },
+    
+    // Support
+    { name: 'AI Chat', x: 900, y: 300, connects: [] },
+    { name: 'Settings', x: 900, y: 500, connects: [] }
+  ];
+
+  // Flow box-ları yarat
+  for (const flow of flows) {
+    const box = figma.createFrame();
+    box.name = flow.name;
+    box.resize(160, 80);
+    box.x = flow.x;
+    box.y = flow.y;
+    box.fills = [{ type: 'SOLID', color: hexToRgb('#ffffff') }];
+    box.cornerRadius = 12;
+    box.strokes = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+    box.strokeWeight = 2;
+    box.effects = [{
+      type: 'DROP_SHADOW',
+      color: { r: 0, g: 0, b: 0, a: 0.1 },
+      offset: { x: 0, y: 4 },
+      radius: 8,
+      visible: true
+    }];
+
+    const boxText = figma.createText();
+    boxText.characters = flow.name;
+    boxText.fontSize = 12;
+    boxText.fontName = boldFont;
+    boxText.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+    boxText.textAlignHorizontal = 'CENTER';
+    boxText.textAlignVertical = 'CENTER';
+    boxText.x = 20;
+    boxText.y = 35;
+    boxText.resize(120, 20);
+    box.appendChild(boxText);
+  }
+
+  // Connector-ları yarat
+  for (const flow of flows) {
+    for (const target of flow.connects) {
+      const targetFlow = flows.find(f => f.name === target);
+      if (targetFlow) {
+        const line = figma.createLine();
+        line.x = flow.x + 160;
+        line.y = flow.y + 40;
+        line.resize(targetFlow.x - flow.x - 160, 0);
+        line.strokes = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+        line.strokeWeight = 2;
+        
+        // Arrow head
+        const arrow = figma.createPolygon();
+        arrow.pointCount = 3;
+        arrow.x = targetFlow.x - 10;
+        arrow.y = targetFlow.y + 35;
+        arrow.resize(10, 10);
+        arrow.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+      }
+    }
+  }
+
+  figma.ui.postMessage({ type: 'progress', message: '✅ Flow Map hazır!', progress: 100 });
+  figma.notify('✅ Flow Map yaradıldı!');
+}
+
+// Yardımçı funksiyalar
+function createHeader(title, isDark = false) {
+  const header = figma.createFrame();
+  header.resize(375, 60);
+  header.x = 0;
+  header.y = 0;
+  header.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#1f2937' : '#ffffff') }];
+  header.strokes = [{ type: 'SOLID', color: hexToRgb(isDark ? '#374151' : '#e5e7eb') }];
+  header.strokeWeight = 1;
+
+  const headerTitle = figma.createText();
+  headerTitle.characters = title;
+  headerTitle.fontSize = 16;
+  headerTitle.fontName = boldFont;
+  headerTitle.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+  headerTitle.x = 20;
+  headerTitle.y = 22;
+  header.appendChild(headerTitle);
+
+  return header;
+}
+
+function createHeaderWithBack(title, isDark = false) {
+  const header = createHeader(title, isDark);
+  
+  const backButton = figma.createFrame();
+  backButton.resize(36, 36);
+  backButton.x = 20;
+  backButton.y = 12;
+  backButton.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#374151' : '#f3f4f6') }];
+  backButton.cornerRadius = 8;
+  header.appendChild(backButton);
+
+  const backIcon = figma.createText();
+  backIcon.characters = '←';
+  backIcon.fontSize = 16;
+  backIcon.fontName = currentFont;
+  backIcon.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#374151') }];
+  backIcon.x = 10;
+  backIcon.y = 10;
+  backButton.appendChild(backIcon);
+
+  // Adjust title position
+  const titleText = header.children.find(child => child.type === 'TEXT');
+  if (titleText) {
+    titleText.x = 70;
+  }
+
+  return header;
+}
+
+function createTabBar(activeIndex = 0, isDark = false) {
+  const tabBar = figma.createFrame();
+  tabBar.resize(375, 80);
+  tabBar.x = 0;
+  tabBar.y = 732;
+  tabBar.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#1f2937' : '#ffffff') }];
+  tabBar.strokes = [{ type: 'SOLID', color: hexToRgb(isDark ? '#374151' : '#e5e7eb') }];
+  tabBar.strokeWeight = 1;
+
+  const tabs = ['🏠 Ana', '📚 Təlimlər', '🧪 İmtahan', '🛍️ Mağaza', '➕ Daha'];
+  for (let i = 0; i < tabs.length; i++) {
+    const tab = figma.createText();
+    tab.characters = tabs[i];
+    tab.fontSize = 10;
+    tab.fontName = currentFont;
+    tab.fills = [{ type: 'SOLID', color: hexToRgb(i === activeIndex ? '#22c55e' : (isDark ? '#9ca3af' : '#6b7280')) }];
+    tab.x = 15 + i * 75;
+    tab.y = 25;
+    tabBar.appendChild(tab);
+  }
+
+  return tabBar;
+}
+
+function createButton(text, variant = 'primary', isDark = false) {
+  const button = figma.createFrame();
+  button.resize(295, 44);
+  
+  let bgColor, textColor;
+  if (variant === 'primary') {
+    bgColor = '#22c55e';
+    textColor = '#ffffff';
+  } else {
+    bgColor = isDark ? '#374151' : '#f3f4f6';
+    textColor = isDark ? '#f9fafb' : '#374151';
+  }
+  
+  button.fills = [{ type: 'SOLID', color: hexToRgb(bgColor) }];
+  button.cornerRadius = 12;
+
+  const buttonText = figma.createText();
+  buttonText.characters = text;
+  buttonText.fontSize = 14;
+  buttonText.fontName = boldFont;
+  buttonText.fills = [{ type: 'SOLID', color: hexToRgb(textColor) }];
+  buttonText.textAlignHorizontal = 'CENTER';
+  buttonText.textAlignVertical = 'CENTER';
+  buttonText.x = 20;
+  buttonText.y = 15;
+  buttonText.resize(255, 14);
+  button.appendChild(buttonText);
+
+  return button;
+}
+
+function createInput(placeholder, isDark = false) {
+  const input = figma.createFrame();
+  input.resize(295, 44);
+  input.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#374151' : '#ffffff') }];
+  input.cornerRadius = 12;
+  input.strokes = [{ type: 'SOLID', color: hexToRgb(isDark ? '#4b5563' : '#e5e7eb') }];
+  input.strokeWeight = 1;
+
+  const inputText = figma.createText();
+  inputText.characters = placeholder;
+  inputText.fontSize = 14;
+  inputText.fontName = currentFont;
+  inputText.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#9ca3af' : '#9ca3af') }];
+  inputText.x = 16;
+  inputText.y = 15;
+  input.appendChild(inputText);
+
+  return input;
+}
+
+function createActionCard(action, x, y, isDark = false) {
+  const card = figma.createFrame();
+  card.resize(160, 80);
+  card.x = x;
+  card.y = y;
+  card.fills = [{ type: 'SOLID', color: hexToRgb(action.locked ? (isDark ? '#374151' : '#f9fafb') : (isDark ? '#1f2937' : '#ffffff')) }];
+  card.cornerRadius = 12;
+  card.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.1 },
+    offset: { x: 0, y: 2 },
+    radius: 4,
+    visible: true
+  }];
+
+  if (action.locked) {
+    const lockIcon = figma.createText();
+    lockIcon.characters = '🔒';
+    lockIcon.fontSize = 16;
+    lockIcon.fontName = currentFont;
+    lockIcon.x = 16;
+    lockIcon.y = 16;
+    card.appendChild(lockIcon);
+  }
+
+  const actionText = figma.createText();
+  actionText.characters = action.title;
+  actionText.fontSize = 12;
+  actionText.fontName = boldFont;
+  actionText.fills = [{ type: 'SOLID', color: hexToRgb(action.locked ? (isDark ? '#9ca3af' : '#9ca3af') : (isDark ? '#f9fafb' : '#374151')) }];
+  actionText.x = action.locked ? 45 : 16;
+  actionText.y = 34;
+  actionText.resize(action.locked ? 99 : 128, 12);
+  card.appendChild(actionText);
+
+  return card;
+}
+
+function createChatHeader(isDark = false) {
+  const header = figma.createFrame();
+  header.resize(375, 80);
+  header.x = 0;
+  header.y = 0;
+  header.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#1f2937' : '#ffffff') }];
+  header.strokes = [{ type: 'SOLID', color: hexToRgb(isDark ? '#374151' : '#e5e7eb') }];
+  header.strokeWeight = 1;
+
+  // Back button
+  const backButton = figma.createFrame();
+  backButton.resize(36, 36);
+  backButton.x = 20;
+  backButton.y = 22;
+  backButton.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#374151' : '#f3f4f6') }];
+  backButton.cornerRadius = 8;
+  header.appendChild(backButton);
+
+  const backIcon = figma.createText();
+  backIcon.characters = '←';
+  backIcon.fontSize = 16;
+  backIcon.fontName = currentFont;
+  backIcon.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#374151') }];
+  backIcon.x = 10;
+  backIcon.y = 10;
+  backButton.appendChild(backIcon);
+
+  // AI avatar
+  const avatar = figma.createFrame();
+  avatar.resize(32, 32);
+  avatar.x = 70;
+  avatar.y = 24;
+  avatar.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+  avatar.cornerRadius = 16;
+  header.appendChild(avatar);
+
+  const avatarIcon = figma.createText();
+  avatarIcon.characters = '🤖';
+  avatarIcon.fontSize = 16;
+  avatarIcon.fontName = currentFont;
+  avatarIcon.x = 8;
+  avatarIcon.y = 8;
+  avatar.appendChild(avatarIcon);
+
+  // Title
+  const title = figma.createText();
+  title.characters = 'DDA.az AI Köməkçi';
+  title.fontSize = 16;
+  title.fontName = boldFont;
+  title.fills = [{ type: 'SOLID', color: hexToRgb(isDark ? '#f9fafb' : '#111827') }];
+  title.x = 110;
+  title.y = 20;
+  header.appendChild(title);
+
+  const status = figma.createText();
+  status.characters = '● Onlayn';
+  status.fontSize = 12;
+  status.fontName = currentFont;
+  status.fills = [{ type: 'SOLID', color: hexToRgb('#22c55e') }];
+  status.x = 110;
+  status.y = 40;
+  header.appendChild(status);
+
+  return header;
+}
+
+function createDefaultDesign(frame, screen) {
+  // Default dizayn
+  frame.fills = [{ type: 'SOLID', color: hexToRgb('#f9fafb') }];
+
   const title = figma.createText();
   title.characters = screen.name;
   title.fontSize = 18;
-  title.fontName = font;
-  title.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  title.fontName = boldFont;
+  title.fills = [{ type: 'SOLID', color: hexToRgb('#111827') }];
   title.x = 20;
   title.y = 40;
   frame.appendChild(title);
 
-  // Kateqoriya
   const category = figma.createText();
   category.characters = `📱 ${screen.category}`;
   category.fontSize = 14;
-  category.fontName = font;
-  category.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1, a: 0.8 } }];
+  category.fontName = currentFont;
+  category.fills = [{ type: 'SOLID', color: hexToRgb('#6b7280') }];
   category.x = 20;
   category.y = 70;
   frame.appendChild(category);
-
-  // Placeholder content
-  const placeholder = figma.createFrame();
-  placeholder.resize(335, 200);
-  placeholder.x = 20;
-  placeholder.y = 120;
-  placeholder.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1, a: 0.1 } }];
-  placeholder.cornerRadius = 12;
-  frame.appendChild(placeholder);
-
-  const placeholderText = figma.createText();
-  placeholderText.characters = 'Ekran məzmunu\nburada olacaq';
-  placeholderText.fontSize = 16;
-  placeholderText.fontName = font;
-  placeholderText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1, a: 0.7 } }];
-  placeholderText.x = 120;
-  placeholderText.y = 90;
-  placeholder.appendChild(placeholderText);
 }
 
-// Hər şeyi yarat
-async function createEverything() {
-  console.log('🚀 Hər şey yaradılır...');
-  
-  try {
-    figma.notify('🚀 Başlanır... (60 saniyə)');
-    
-    await createColorSystem();
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    await createTypographySystem();
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    await createComponents();
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    await createDetailedScreens();
-    
-    figma.notify('🎉 Tamamlandı! 30 detallı ekran + design system hazır!');
-    console.log('🎉 Hər şey tamamlandı!');
-    
-  } catch (error) {
-    console.error('❌ Ümumi xəta:', error);
-    figma.notify('❌ Ümumi xəta: ' + error.message, { error: true });
-  }
-}
-
-// Yardımçı funksiyalar
+// Hex rəngi RGB-yə çevir
 function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? {
@@ -1311,4 +1157,4 @@ function hexToRgb(hex) {
   } : { r: 0, g: 0, b: 0 };
 }
 
-console.log('✅ Plugin hazırdır - Detallı Dizayn Modu!');
+console.log('✅ Plugin hazırdır!');

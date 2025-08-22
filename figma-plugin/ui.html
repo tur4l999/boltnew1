@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>DDA.az Design Export - Tam Versiya</title>
+  <title>DDA.az Design Exporter</title>
   <style>
     * {
       box-sizing: border-box;
@@ -19,7 +19,7 @@
     }
     
     .container {
-      max-width: 450px;
+      max-width: 400px;
       margin: 0 auto;
     }
     
@@ -29,8 +29,8 @@
     }
     
     .logo {
-      width: 70px;
-      height: 70px;
+      width: 60px;
+      height: 60px;
       background: linear-gradient(135deg, #22c55e, #16a34a);
       border-radius: 16px;
       margin: 0 auto 16px;
@@ -39,12 +39,12 @@
       justify-content: center;
       color: white;
       font-weight: 900;
-      font-size: 24px;
+      font-size: 20px;
       box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
     }
     
     h1 {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 800;
       margin-bottom: 6px;
       background: linear-gradient(135deg, #22c55e, #16a34a);
@@ -55,7 +55,7 @@
     
     .subtitle {
       color: #6b7280;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 500;
     }
     
@@ -68,22 +68,22 @@
     
     .stat {
       background: white;
-      padding: 16px 12px;
+      padding: 12px 8px;
       border-radius: 12px;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       border: 1px solid rgba(34, 197, 94, 0.1);
     }
     
     .stat-number {
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 800;
       color: #22c55e;
       margin-bottom: 4px;
     }
     
     .stat-label {
-      font-size: 12px;
+      font-size: 11px;
       color: #6b7280;
       font-weight: 600;
     }
@@ -91,88 +91,39 @@
     .section {
       background: white;
       border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
       border: 1px solid rgba(34, 197, 94, 0.1);
     }
     
     .section h3 {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       margin-bottom: 12px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       color: #1f2937;
     }
     
     .section p {
-      font-size: 14px;
+      font-size: 13px;
       color: #6b7280;
-      line-height: 1.6;
-      margin-bottom: 20px;
+      line-height: 1.5;
+      margin-bottom: 16px;
     }
-    
-    .features {
-      list-style: none;
-      margin-bottom: 20px;
-    }
-    
-    .features li {
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #374151;
-      font-weight: 500;
-    }
-    
-    .features li::before {
-      content: "✓";
-      color: #22c55e;
-      font-weight: 700;
-      margin-right: 12px;
-      width: 20px;
-      text-align: center;
-    }
-    
-    .screen-categories {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 20px;
-      font-size: 12px;
-    }
-    
-    .category {
-      padding: 8px 12px;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: 600;
-      border: 1px solid;
-    }
-    
-    .category.auth { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
-    .category.main { background: #f9fafb; color: #374151; border-color: #e5e7eb; }
-    .category.purchase { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
-    .category.premium { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
-    .category.learning { background: #fef3c7; color: #92400e; border-color: #fde68a; }
-    .category.exam { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
-    .category.support { background: #f3e8ff; color: #7c3aed; border-color: #ddd6fe; }
-    .category.profile { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
-    .category.dark { background: #1f2937; color: #f9fafb; border-color: #374151; }
     
     button {
       width: 100%;
-      padding: 14px 20px;
+      padding: 12px 16px;
       border: none;
       border-radius: 12px;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 14px;
       cursor: pointer;
       transition: all 0.3s ease;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       position: relative;
       overflow: hidden;
     }
@@ -231,7 +182,7 @@
       height: 6px;
       background: #e5e7eb;
       border-radius: 3px;
-      margin: 16px 0;
+      margin: 12px 0;
       overflow: hidden;
     }
     
@@ -245,75 +196,53 @@
     
     .status {
       text-align: center;
-      font-size: 13px;
+      font-size: 12px;
       color: #6b7280;
       margin-top: 12px;
-      min-height: 20px;
+      min-height: 18px;
       font-weight: 600;
     }
     
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
+    .log {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 11px;
+      color: #475569;
+      max-height: 120px;
+      overflow-y: auto;
+      margin-top: 16px;
     }
     
     .highlight {
       background: linear-gradient(135deg, #22c55e, #16a34a);
       color: white;
-      padding: 20px;
+      padding: 16px;
       border-radius: 16px;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
     }
     
     .highlight h2 {
-      font-size: 20px;
-      margin-bottom: 6px;
+      font-size: 18px;
+      margin-bottom: 4px;
       font-weight: 800;
     }
     
     .highlight p {
-      font-size: 14px;
+      font-size: 13px;
       opacity: 0.95;
       font-weight: 500;
     }
     
-    .navigation-info {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
-    }
-    
-    .navigation-info h4 {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 8px;
-    }
-    
-    .navigation-info ul {
-      list-style: none;
-      font-size: 12px;
-      color: #64748b;
-    }
-    
-    .navigation-info li {
-      margin-bottom: 4px;
-      padding-left: 16px;
-      position: relative;
-    }
-    
-    .navigation-info li::before {
-      content: "→";
-      position: absolute;
-      left: 0;
-      color: #22c55e;
-      font-weight: 700;
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
     }
     
     @keyframes pulse {
@@ -330,102 +259,58 @@
   <div class="container">
     <div class="header">
       <div class="logo">DDA</div>
-      <h1>Design Export</h1>
-      <p class="subtitle">Tam tətbiq dizaynını Figmaya köçürün</p>
+      <h1>Design Exporter</h1>
+      <p class="subtitle">34 mobil ekran + design system + flow map</p>
     </div>
     
     <div class="stats">
       <div class="stat">
-        <div class="stat-number">30</div>
+        <div class="stat-number">34</div>
         <div class="stat-label">Ekranlar</div>
       </div>
       <div class="stat">
-        <div class="stat-number">25</div>
+        <div class="stat-number">30</div>
         <div class="stat-label">Rənglər</div>
       </div>
       <div class="stat">
-        <div class="stat-number">8</div>
-        <div class="stat-label">Komponentlər</div>
+        <div class="stat-number">6</div>
+        <div class="stat-label">Typography</div>
       </div>
     </div>
     
     <div class="highlight">
-      <h2>🚀 Tam Naviqasiya Sistemi</h2>
-      <p>Hər düymə və keçid detallı şəkildə təyin edilmişdir</p>
-    </div>
-    
-    <div class="section">
-      <h3>📱 Bütün Ekranlar + Naviqasiya</h3>
-      <p>Hər səhifədə hansı düymənin hara apardığı göstərilir</p>
-      
-      <div class="screen-categories">
-        <div class="category auth">🔐 Auth (1)</div>
-        <div class="category main">🏠 Main (4)</div>
-        <div class="category purchase">💳 Purchase (4)</div>
-        <div class="category premium">⭐ Premium (2)</div>
-        <div class="category learning">📚 Learning (4)</div>
-        <div class="category exam">🧪 Exam (5)</div>
-        <div class="category support">🤖 Support (2)</div>
-        <div class="category profile">👤 Profile (4)</div>
-        <div class="category dark">🌙 Dark (4)</div>
-      </div>
-      
-      <div class="navigation-info">
-        <h4>🧭 Naviqasiya Məlumatları</h4>
-        <ul>
-          <li>Login düyməsi → Home Screen</li>
-          <li>Paket Al düyməsi → Packages List</li>
-          <li>Video Dərs → Lesson Screen</li>
-          <li>İmtahan → Exam Config</li>
-          <li>Səhvlərim → Mistakes Screen</li>
-          <li>AI Köməkçi → AI Chat</li>
-          <li>Parametrlər → Settings</li>
-        </ul>
-      </div>
-      
-      <ul class="features">
-        <li>Login və Authentication flow</li>
-        <li>Paket yoxdur vəziyyəti (kilidli modullar)</li>
-        <li>Paket satın alma prosesi</li>
-        <li>Premium funksiyalar (açıq modullar)</li>
-        <li>Dərs və video player</li>
-        <li>İmtahan simulyatoru</li>
-        <li>AI Chat və dəstək sistemi</li>
-        <li>Dark mode variantları</li>
-        <li>Parametrlər və profil</li>
-        <li>Balans və ödənişlər</li>
-      </ul>
-      
-      <button class="btn-secondary" onclick="createScreens()">📱 Ekranları Yarat</button>
+      <h2>🚀 Tam Mobil Design System</h2>
+      <p>Auth, Main, Purchase, Premium, Learning, Exam, Support, Profile + Dark variants</p>
     </div>
     
     <div class="section">
       <h3>🎨 Design System</h3>
-      <p>Tam rəng sistemi və komponentlər</p>
-      <ul class="features">
-        <li>Primary, Gray, Emerald, Red, Blue rənglər</li>
-        <li>Typography stilləri (H1-Caption)</li>
-        <li>Button, Card, Header komponentləri</li>
-        <li>Input, Module, TabBar komponentləri</li>
-        <li>Spacing və border radius</li>
-      </ul>
-      <div class="grid">
-        <button class="btn-secondary" onclick="createColors()">🎨 Rənglər</button>
-        <button class="btn-secondary" onclick="createTypography()">📝 Typography</button>
-      </div>
-      <button class="btn-secondary" onclick="createComponents()">🧩 Komponentlər</button>
+      <p>Light/Dark rəng tokenlər və typography stilləri</p>
+      <button class="btn-secondary" onclick="createStyles()">🎨 Yalnız Stillər</button>
     </div>
     
     <div class="section">
-      <h3>⚡ Avtomatik Yaratma</h3>
-      <p>Hər şeyi bir kliklə yaradın - 30 ekran + design system + naviqasiya</p>
+      <h3>📱 Mobil Ekranlar</h3>
+      <p>34 tam dizayn edilmiş ekran (375×812) + 4 dark variant</p>
       <div class="progress">
         <div class="progress-bar" id="progressBar"></div>
       </div>
       <div class="status" id="status">Hazır</div>
-      <button class="btn-primary" onclick="createEverything()">
-        🚀 Hər Şeyi Yarat (30 Ekran + Naviqasiya)
+      <button class="btn-primary" onclick="createAll()">
+        🚀 Hər Şeyi Yarat (34 Ekran)
       </button>
+      <div class="grid">
+        <button class="btn-secondary" onclick="regenerate()">♻️ Yenidən Yarat</button>
+        <button class="btn-secondary" onclick="createFlow()">🗺️ Flow Map</button>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h3>📋 Log</h3>
+      <div class="log" id="log">Plugin hazırdır...</div>
+    </div>
+    
+    <div class="section">
       <button class="btn-danger" onclick="closePlugin()">
         Bağla
       </button>
@@ -433,47 +318,38 @@
   </div>
 
   <script>
-    function createColors() {
-      updateStatus('🎨 Rənglər yaradılır...', 25);
-      parent.postMessage({ pluginMessage: { type: 'create-colors' } }, '*');
-      setTimeout(() => updateStatus('✅ 25 rəng stili hazır!', 100), 2000);
-    }
-    
-    function createTypography() {
-      updateStatus('📝 Typography yaradılır...', 35);
-      parent.postMessage({ pluginMessage: { type: 'create-typography' } }, '*');
-      setTimeout(() => updateStatus('✅ 6 text stili hazır!', 100), 2000);
-    }
-    
-    function createComponents() {
-      updateStatus('🧩 Komponentlər yaradılır...', 45);
-      parent.postMessage({ pluginMessage: { type: 'create-components' } }, '*');
-      setTimeout(() => updateStatus('✅ 8 komponent hazır!', 100), 2000);
-    }
-    
-    function createScreens() {
-      updateStatus('📱 30 ekran + naviqasiya yaradılır...', 80);
-      parent.postMessage({ pluginMessage: { type: 'create-screens' } }, '*');
-      setTimeout(() => updateStatus('✅ 30 ekran + naviqasiya hazır!', 100), 5000);
-    }
-    
-    function createEverything() {
-      updateStatus('🚀 Başlanır...', 5);
+    function createAll() {
+      updateStatus('🚀 34 ekran yaradılır...', 5);
       parent.postMessage({ pluginMessage: { type: 'create-all' } }, '*');
-      
-      setTimeout(() => updateStatus('🎨 Rənglər yaradılır...', 20), 500);
-      setTimeout(() => updateStatus('📝 Typography yaradılır...', 35), 2000);
-      setTimeout(() => updateStatus('🧩 Komponentlər yaradılır...', 50), 3500);
-      setTimeout(() => updateStatus('📱 30 ekran + naviqasiya yaradılır...', 85), 4500);
-      setTimeout(() => updateStatus('🎉 Tamamlandı! 30 ekran + naviqasiya hazır!', 100), 8000);
+    }
+    
+    function createStyles() {
+      updateStatus('🎨 Design system yaradılır...', 20);
+      parent.postMessage({ pluginMessage: { type: 'create-styles' } }, '*');
+    }
+    
+    function regenerate() {
+      updateStatus('♻️ Təmizlənir və yenidən yaradılır...', 10);
+      parent.postMessage({ pluginMessage: { type: 'regenerate' } }, '*');
+    }
+    
+    function createFlow() {
+      updateStatus('🗺️ Flow Map yaradılır...', 30);
+      parent.postMessage({ pluginMessage: { type: 'create-flow' } }, '*');
     }
     
     function updateStatus(message, progress) {
       const statusEl = document.getElementById('status');
       const progressEl = document.getElementById('progressBar');
+      const logEl = document.getElementById('log');
       
       statusEl.textContent = message;
       progressEl.style.width = progress + '%';
+      
+      // Log-a əlavə et
+      const timestamp = new Date().toLocaleTimeString();
+      logEl.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
       
       if (progress === 100) {
         statusEl.style.color = '#22c55e';
@@ -487,6 +363,21 @@
     function closePlugin() {
       parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
     }
+    
+    // Plugin mesajlarını dinlə
+    window.addEventListener('message', (event) => {
+      const msg = event.data.pluginMessage;
+      if (msg) {
+        switch (msg.type) {
+          case 'progress':
+            updateStatus(msg.message, msg.progress);
+            break;
+          case 'error':
+            updateStatus('❌ Xəta: ' + msg.message, 0);
+            break;
+        }
+      }
+    });
   </script>
 </body>
 </html>

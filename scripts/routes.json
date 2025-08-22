@@ -1,0 +1,245 @@
+{
+  "screens": [
+    {
+      "id": "login",
+      "name": "Login",
+      "category": "Auth",
+      "description": "User authentication with social login options",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "onboarding-1",
+      "name": "Onboarding 1",
+      "category": "Auth", 
+      "description": "Welcome and app introduction",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "onboarding-2",
+      "name": "Onboarding 2",
+      "category": "Auth",
+      "description": "Features overview",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "onboarding-3",
+      "name": "Onboarding 3",
+      "category": "Auth",
+      "description": "Get started call-to-action",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "home-no-package",
+      "name": "Home (No Package)",
+      "category": "Main",
+      "description": "Home screen when user has no active package",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "topics-locked",
+      "name": "Topics (Locked)",
+      "category": "Main",
+      "description": "Topics screen with locked modules",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "store",
+      "name": "Store",
+      "category": "Main",
+      "description": "Digital store for books and materials",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "more",
+      "name": "More Menu",
+      "category": "Main",
+      "description": "Additional options and settings menu",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "packages",
+      "name": "Packages List",
+      "category": "Purchase",
+      "description": "Learning package options and pricing",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "package-details",
+      "name": "Package Details",
+      "category": "Purchase",
+      "description": "Detailed view of selected package",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "payment",
+      "name": "Payment Methods",
+      "category": "Purchase",
+      "description": "Payment options and checkout",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "success",
+      "name": "Purchase Success",
+      "category": "Purchase",
+      "description": "Successful purchase confirmation",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "home-premium",
+      "name": "Home (Premium)",
+      "category": "Premium",
+      "description": "Home screen with premium features unlocked",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "topics-unlocked",
+      "name": "Topics (Unlocked)",
+      "category": "Premium",
+      "description": "Topics screen with all modules accessible",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "lesson",
+      "name": "Lesson View",
+      "category": "Learning",
+      "description": "Video lesson with materials and tabs",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "video",
+      "name": "Video Player",
+      "category": "Learning",
+      "description": "Full-screen video player interface",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "practice",
+      "name": "Practice Questions",
+      "category": "Learning",
+      "description": "Interactive practice questions",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "teacher",
+      "name": "Teacher Contact",
+      "category": "Learning",
+      "description": "Contact form for teacher support",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "exam-config",
+      "name": "Exam Config",
+      "category": "Exam",
+      "description": "Exam setup and configuration",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "exam-running",
+      "name": "Exam Running",
+      "category": "Exam",
+      "description": "Active exam with timer and questions",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "results-pass",
+      "name": "Exam Results (Pass)",
+      "category": "Exam",
+      "description": "Successful exam completion results",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "results-fail",
+      "name": "Exam Results (Fail)",
+      "category": "Exam",
+      "description": "Failed exam results with improvement suggestions",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "mistakes",
+      "name": "Mistakes Review",
+      "category": "Exam",
+      "description": "Review of incorrect answers",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "ai-chat",
+      "name": "AI Chat",
+      "category": "Support",
+      "description": "AI assistant chat interface",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "chat-history",
+      "name": "Chat History",
+      "category": "Support",
+      "description": "Previous chat conversations",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "notifications",
+      "name": "Notifications",
+      "category": "Support",
+      "description": "Push notifications and alerts",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "settings",
+      "name": "Settings",
+      "category": "Profile",
+      "description": "User settings and preferences",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "profile-edit",
+      "name": "Profile Edit",
+      "category": "Profile",
+      "description": "Edit user profile information",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "transactions",
+      "name": "Transactions",
+      "category": "Profile",
+      "description": "Payment history and balance",
+      "size": { "width": 375, "height": 812 }
+    },
+    {
+      "id": "balance",
+      "name": "Balance Top-up",
+      "category": "Profile",
+      "description": "Add funds to account balance",
+      "size": { "width": 375, "height": 812 }
+    }
+  ],
+  "darkVariants": [
+    "home-premium",
+    "topics-unlocked", 
+    "lesson",
+    "settings"
+  ],
+  "flowConnections": {
+    "Login": ["Onboarding 1"],
+    "Onboarding 1": ["Onboarding 2"],
+    "Onboarding 2": ["Onboarding 3"],
+    "Onboarding 3": ["Home (No Package)"],
+    "Home (No Package)": ["Topics (Locked)", "Store", "More", "Packages List"],
+    "Topics (Locked)": ["Packages List"],
+    "Store": [],
+    "More": ["Settings", "AI Chat"],
+    "Packages List": ["Package Details"],
+    "Package Details": ["Payment Methods"],
+    "Payment Methods": ["Purchase Success"],
+    "Purchase Success": ["Home (Premium)"],
+    "Home (Premium)": ["Topics (Unlocked)", "Lesson View"],
+    "Topics (Unlocked)": ["Lesson View"],
+    "Lesson View": ["Practice Questions", "Exam Config"],
+    "Practice Questions": ["Exam Config"],
+    "Exam Config": ["Exam Running"],
+    "Exam Running": ["Exam Results (Pass)", "Exam Results (Fail)"],
+    "Exam Results (Pass)": ["Home (Premium)"],
+    "Exam Results (Fail)": ["Mistakes Review"],
+    "Mistakes Review": ["Practice Questions"],
+    "AI Chat": ["Chat History"],
+    "Settings": ["Profile Edit", "Transactions", "Balance Top-up"]
+  }
+}
