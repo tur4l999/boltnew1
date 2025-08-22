@@ -4,7 +4,7 @@
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
-  "containsWidget": false,
+  "containsWidget": true,
   "documentAccess": "dynamic-page",
   "networkAccess": {
     "allowedDomains": ["none"]
