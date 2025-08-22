@@ -1,14 +1,5 @@
 // Figma Export Routes Configuration
-export interface FigmaRoute {
-  id: string;
-  name: string;
-  path: string;
-  category: 'auth' | 'main' | 'learning' | 'exam' | 'store' | 'profile' | 'support';
-  description: string;
-  mockData?: any;
-}
-
-export const figmaRoutes: FigmaRoute[] = [
+export const figmaRoutes = [
   // Auth Flow
   {
     id: 'login',
