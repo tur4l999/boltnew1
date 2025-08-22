@@ -4,13 +4,8 @@
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
-  "containsWidget": true,
   "documentAccess": "dynamic-page",
   "networkAccess": {
-    "allowedDomains": ["none"]
-  },
-  "relaunchButtons": [
-    { "command": "create-all", "name": "Create All Screens" },
-    { "command": "create-styles", "name": "Create Styles" }
-  ]
+    "allowedDomains": []
+  }
 }
